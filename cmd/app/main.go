@@ -22,6 +22,6 @@ func main() {
 	listenAddr := os.Getenv("LISTEN_ADDR")
 
 	router.Get("/", handlers.Make(handlers.HandleRoot))
-	fmt.Printf("http://localhost%s", listenAddr)
+	fmt.Printf("http://localhost%s\n", listenAddr)
 	http.ListenAndServe(listenAddr, router)
 }

@@ -10,4 +10,4 @@ build:	templ
 	@go build -o $(build_dir) ./cmd/app
 
 watch:
-	@air
+	@air --build.cmd "go build -o ./bin/sillysocks-GoTH ./cmd/app" --build.bin "./bin/sillysocks-GoTH"
