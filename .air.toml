@@ -1,0 +1,12 @@
+# Config file for Air
+[build]
+# CMD to build and run
+bin = "./bin/sillysocks-GoTH.exe"
+cmd = "go build -tags dev -o ./bin/sillysocks-GoTH.exe ./cmd/app"
+# Watch these directories
+include_dir = []
+include_ext = ["go", "tmpl", "html"]
+exclude_dir = ["tmp", "bin"]
+
+[log]
+level = "info"
