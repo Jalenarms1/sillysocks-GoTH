@@ -1,5 +1,8 @@
 build_dir=./bin/sillysocks-GoTH
 
+tailwind:
+	@npx tailwindcss -i ./tailwind.css -o ./public/tailwind.css
+
 templ:
 	@templ generate
 
@@ -9,5 +12,5 @@ run: build
 build:	templ
 	@go build -o $(build_dir) ./cmd/app
 
-watch:
-	@air --build.cmd "go build -o ./bin/sillysocks-GoTH ./cmd/app" --build.bin "./bin/sillysocks-GoTH"
+watch: templ
+	@air --build.cmd "go build -o $(build_dir) ./cmd/app" --build.bin "$(build_dir)" --build.exclude_dir="node_modules"
