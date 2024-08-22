@@ -1,0 +1,11 @@
+package views
+
+import "github.com/Jalenarms1/sillysocks-GoTH/views/layouts"
+
+templ Home(name string) {
+	@layouts.App() {
+		<div>
+			<p>Hello, { name }</p>
+		</div>
+	}
+}

@@ -7,5 +7,5 @@ import (
 )
 
 func HandleRoot(w http.ResponseWriter, r *http.Request) error {
-	return Render(w, r, views.Index("Jalen"))
+	return Render(w, r, views.Home("Jalen"))
 }
