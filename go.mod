@@ -7,10 +7,10 @@ require (
 	github.com/joho/godotenv v1.5.1
 )
 
-require github.com/a-h/templ v0.2.747
-
 require (
-	github.com/gorilla/securecookie v1.1.2 // indirect
-	github.com/gorilla/sessions v1.4.0 // indirect
-	github.com/lib/pq v1.10.9 // indirect
+	github.com/a-h/templ v0.2.771
+	github.com/gorilla/sessions v1.4.0
+	github.com/lib/pq v1.10.9
 )
+
+require github.com/gorilla/securecookie v1.1.2 // indirect

@@ -6,9 +6,9 @@ import (
 )
 
 type CartItem struct {
-	ProductId string  `json:"productId"`
-	Price     float64 `json:"price"`
-	Quantity  int     `json:"quantity"`
+	Product  Product `json:"product"`
+	Price    float64 `json:"price"`
+	Quantity int     `json:"quantity"`
 }
 
 type Cart struct {
