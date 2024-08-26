@@ -1,0 +1,16 @@
+package home
+
+import "github.com/Jalenarms1/sillysocks-GoTH/models"
+
+
+templ CatalogSlides(products []models.Product) {
+    // slide map 
+    <div class="carousel carousel-center bg-zinc-100 rounded-md space-x-4 p-4">
+        for _, p := range products {
+            @Slide(p)
+
+        }
+        
+    </div>
+    
+}

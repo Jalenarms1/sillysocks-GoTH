@@ -1,0 +1,71 @@
+package cartview
+
+import "github.com/Jalenarms1/sillysocks-GoTH/views/layouts"
+import "github.com/Jalenarms1/sillysocks-GoTH/views/icons"
+
+templ Page() {
+    @layouts.App() {
+
+        <div class="flex flex-col gap-2 p-4 min-h-screen">
+            <p class="text-3xl font-semibold">Cart</p>
+            <div class="overflow-x-auto">
+                <table class="table table-xs">
+                    <!-- head -->
+                    <thead>
+                    <tr>
+                        <th>
+                        <label>
+                            <input type="checkbox" class="checkbox" />
+                        </label>
+                        </th>
+                        <th></th>
+                        <th>Name</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <!-- row 1 -->
+                        <tr>
+                            <th>
+                            <label>
+                                <input type="checkbox" class="checkbox" />
+                            </label>
+                            </th>
+                            <td>
+                                <div class="flex items-center gap-3">
+                                    <div class="avatar">
+                                        <div class="mask mask-squircle h-12 w-12">
+                                            <img
+                                            src="https://img.daisyui.com/images/profile/demo/2@94.webp"
+                                            alt="Avatar Tailwind CSS Component" />
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </td>
+                            <td >
+                               <span class="text-lg truncate">Hart Hagerty</span> 
+                            </td>
+                            <td>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-4 h-4 text-black">
+                                        @icons.MinusBtn()
+                                    </div>
+                                    <p class="text-lg">1</p>
+                                    <div class="w-4 h-4 text-black">
+                                        @icons.AddBtn()
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-lg">$19.99</td>
+                            
+                            
+                        </tr>
+                    </tbody>
+                    
+                </table>
+            </div>
+        </div>
+    }
+}

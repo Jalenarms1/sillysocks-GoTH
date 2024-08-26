@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/gob"
 	"fmt"
 	"log"
 	"net/http"
@@ -8,16 +9,23 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/Jalenarms1/sillysocks-GoTH/db"
 	"github.com/Jalenarms1/sillysocks-GoTH/handlers"
+	"github.com/Jalenarms1/sillysocks-GoTH/models"
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
 )
 
 func main() {
+	gob.Register(&models.Cart{})
+	gob.Register(&models.CartItem{})
 	if err := godotenv.Load(); err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println("Hello World")
+
+	db.InitDB(os.Getenv("DB_CONN_STR"))
+	defer db.DB.Close()
 
 	router := chi.NewMux()
 
@@ -27,7 +35,9 @@ func main() {
 
 	listenAddr := os.Getenv("LISTEN_ADDR")
 
-	router.Get("/", handlers.Make(handlers.HandleRoot))
+	handlers.RegisterRouter(router)
+
+	router.Get("/", handlers.UseHTTPHandler(handlers.HandleRoot))
 	fmt.Printf("http://localhost%s\n", listenAddr)
 	http.ListenAndServe(listenAddr, router)
 }

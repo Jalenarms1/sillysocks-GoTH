@@ -9,7 +9,7 @@ import (
 
 type HTTPHandler func(w http.ResponseWriter, r *http.Request) error
 
-func Make(h HTTPHandler) http.HandlerFunc {
+func UseHTTPHandler(h HTTPHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if err := h(w, r); err != nil {
 			slog.Error("HTTP Error", "err", err, "path", r.URL)
