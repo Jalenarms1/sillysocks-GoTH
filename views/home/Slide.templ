@@ -1,48 +1,42 @@
 package home
 
-import "github.com/Jalenarms1/sillysocks-GoTH/views/icons"
-import "github.com/Jalenarms1/sillysocks-GoTH/models"
-import "github.com/Jalenarms1/sillysocks-GoTH/views/shared"
-import "fmt"
+import (
+	"github.com/Jalenarms1/sillysocks-GoTH/models"
+	"github.com/Jalenarms1/sillysocks-GoTH/views/icons"
+	"github.com/Jalenarms1/sillysocks-GoTH/views/shared"
+)
 
-templ AddToCartBtn(product models.Product ) {
-    // <form hx-post="/api/cart/add" class="">
-        <button hx-post="/api/cart/add" hx-val={fmt.Sprintf("{'product': '%v'}", product)} type="submit" class=" w-10 h-10">
-            @icons.BagIcon()
-        </button>
-        <input type="hidden" id={fmt.Sprintf("cart-item-%s", product.Id)} name="product" value={`{"product": "Hello"}`} />
-        <input type="hidden" name="productId" value={fmt.Sprintf("%s", product.Id)} />
-        <input type="hidden" name="price" value={fmt.Sprintf("%.2f", product.Price)} />
-    // </form>
+templ AddToCartBtn(product models.Product) {
+	<form hx-post="/api/cart/add" class="">
+		<button type="submit" class=" w-10 h-10 text-black">
+			@icons.BagIcon()
+		</button>
+		<input type="hidden" name="product" value={ product.ToJson() }/>
+	</form>
 }
 
 templ Slide(product models.Product) {
-    <div class="carousel-item min-w-60 max-w-full relative">
-        <a href="" class="w-full">
-            <img
-            src={product.Image}
-            class="rounded-md  shadow-sm shadow-zinc-500 w-full h-96" />
-
-        </a>
-        <div class="absolute w-full top-0  p-2 bg-zinc-800 rounded-lg shadow-sm shadow-zinc-500">
-            
-                <p class="text-xl truncate text-yellow-300 font-semibold">${shared.ConvStr(product.Price)}</p>
-
-            
-        </div>
-        <div class="absolute w-full bottom-0 flex  items-center p-3 justify-end ">
-            
-            <div class="bg-yellow-300 p-2 rounded-full active:scale-[.95] shadow-sm shadow-slate-600">
-                // <form hx-post="/api/cart/add" class="">
-                //     <button type="submit" class=" w-10 h-10">
-                //         @icons.BagIcon()
-                //     </button>
-                //     <input type="hidden" name="product" value={fmt.Sprintf("%s", product.Id)} />
-                //     <input type="hidden" name="price" value={fmt.Sprintf("%.2f", product.Price)} />
-                // </form>
-                @AddToCartBtn(product)
-            </div>
-            
-        </div>
-    </div>
+	<div class="carousel-item min-w-60 max-w-full relative">
+		<a href="" class="w-full">
+			<img
+				src={ product.Image }
+				class="rounded-md  shadow-sm shadow-zinc-500 w-full h-96"
+			/>
+		</a>
+		<div class="absolute w-full top-0  p-2 bg-zinc-800 rounded-lg shadow-sm shadow-zinc-500">
+			<p class="text-xl truncate text-yellow-300 font-semibold">${ shared.ConvStr(product.Price) }</p>
+		</div>
+		<div class="absolute w-full bottom-0 flex  items-center p-3 justify-end ">
+			<div class="bg-yellow-300 p-2 rounded-full active:scale-[.95] shadow-sm shadow-slate-600">
+				// <form hx-post="/api/cart/add" class="">
+				//     <button type="submit" class=" w-10 h-10">
+				//         @icons.BagIcon()
+				//     </button>
+				//     <input type="hidden" name="product" value={fmt.Sprintf("%s", product.Id)} />
+				//     <input type="hidden" name="price" value={fmt.Sprintf("%.2f", product.Price)} />
+				// </form>
+				@AddToCartBtn(product)
+			</div>
+		</div>
+	</div>
 }

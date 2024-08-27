@@ -15,31 +15,33 @@ import (
 )
 
 func handleAddToCart(w http.ResponseWriter, r *http.Request) error {
-	// err := r.ParseForm()
-	// productId := r.FormValue("product")
-	// priceStr := r.FormValue("price")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// price, _ := strconv.ParseFloat(priceStr, 64)
+	err := r.ParseForm()
+	productStr := r.FormValue("product")
 	var product models.Product
-
-	err := json.NewDecoder(r.Body).Decode(&product)
-
+	jsonErr := json.Unmarshal([]byte(productStr), &product)
+	if jsonErr != nil {
+		log.Fatal(jsonErr)
+	}
+  
+	fmt.Printf("\n%v\n", product)
+  
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("\nProduct: %v", product)
+  
 	cart := models.GetCart(w, r)
 
 	itemFound := false
 	for i, ci := range cart.CartItems {
 		if ci.Product.Id == product.Id {
 			cart.CartItems[i].Quantity += 1
-			cart.SubTotal = math.Round((cart.SubTotal+ci.Price)*100) / 100
+			cart.CartItems[i].Price = ci.Product.Price * float64(cart.CartItems[i].Quantity)
+			cart.SubTotal = math.Round((cart.SubTotal+ci.Product.Price)*100) / 100
 			cart.Tax = math.Round((cart.SubTotal*1.08-cart.SubTotal)*100) / 100
 			itemFound = true
+
+			fmt.Printf("%.2f", ci.Price)
+
 			break
 		}
 	}
@@ -62,10 +64,6 @@ func handleAddToCart(w http.ResponseWriter, r *http.Request) error {
 		log.Fatal(addErr)
 	}
 
-	// fmt.Printf("%s\n", product.Id)
-	// fmt.Printf("%f\n", cart.SubTotal)
-	// fmt.Printf("%.2f\n", product.Price)
-
 	w.Header().Set("HX-Trigger", "loadCartCount")
 
 	return Render(w, r, home.AddToCartBtn(product))
@@ -73,15 +71,26 @@ func handleAddToCart(w http.ResponseWriter, r *http.Request) error {
 
 func handleGetCartCount(w http.ResponseWriter, r *http.Request) error {
 	cart := models.GetCart(w, r)
-
-	return Render(w, r, icons.CartIcon(cart.NumOfItems()))
+	var numOfItems int
+	if cart == nil {
+		numOfItems = 0
+	} else {
+		numOfItems = cart.NumOfItems()
+	}
+	return Render(w, r, icons.CartIcon(numOfItems))
 
 }
 
 func handleGetCartTotal(w http.ResponseWriter, r *http.Request) error {
 	cart := models.GetCart(w, r)
-	total := fmt.Sprintf("$%.2f", cart.GetTotal())
-	fmt.Fprint(w, total)
+	var total float64
+	if cart == nil {
+		total = 0
+	} else {
+		total = cart.GetTotal()
+
+	}
+	fmt.Fprint(w, fmt.Sprintf("$%.2f", total))
 
 	return nil
 }
@@ -92,7 +101,7 @@ func handleCartPage(w http.ResponseWriter, r *http.Request) error {
 
 func handleGetCartItems(w http.ResponseWriter, r *http.Request) error {
 	cart := models.GetCart(w, r)
-
+	fmt.Printf("\n%v\n", cart)
 	return Render(w, r, cartview.CartItems(cart.CartItems))
 }
 

@@ -49,7 +49,9 @@ func GetCart(w http.ResponseWriter, r *http.Request) *Cart {
 	if cart, ok := session.Values["cart"].(*Cart); ok && cart != nil {
 		return cart
 	}
-
+	if cart == nil {
+		cart = &Cart{}
+	}
 	return cart
 
 }

@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"encoding/json"
 	"log"
 
 	"github.com/Jalenarms1/sillysocks-GoTH/db"
@@ -15,6 +16,12 @@ type Product struct {
 	Image       string  `json:"image"`
 	Price       float64 `json:"price"`
 	Quantity    int     `json:"quantity"`
+}
+
+func (product *Product) ToJson() string {
+	bytes, _ := json.Marshal(product)
+
+	return string(bytes)
 }
 
 func NewProduct(product Product) *Product {
