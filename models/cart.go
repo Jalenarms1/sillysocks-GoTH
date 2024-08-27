@@ -6,9 +6,9 @@ import (
 )
 
 type CartItem struct {
-	ProductId string  `json:"productId"`
-	Price     float64 `json:"price"`
-	Quantity  int     `json:"quantity"`
+	Product  Product `json:"product"`
+	Price    float64 `json:"price"`
+	Quantity int     `json:"quantity"`
 }
 
 type Cart struct {
@@ -49,7 +49,9 @@ func GetCart(w http.ResponseWriter, r *http.Request) *Cart {
 	if cart, ok := session.Values["cart"].(*Cart); ok && cart != nil {
 		return cart
 	}
-
+	if cart == nil {
+		cart = &Cart{}
+	}
 	return cart
 
 }

@@ -3,10 +3,10 @@ package home
 import "github.com/Jalenarms1/sillysocks-GoTH/views/icons"
 
 templ FreeShippingAlert() {
-    <div class="bg-yellow-300 py-3 px-2 flex items-center gap-2 rounded-md">
-        <div class="w-12 h-12">
-            @icons.WarningIcon()
-        </div>
-        <p class="text-sm">Free shipping on orders over $20 for a limited time only.</p>
-    </div>
+	<div class="bg-yellow-300 py-3 px-2 flex items-center gap-2 rounded-md text-black">
+		<div class="w-12 h-12 mt-2">
+			@icons.WarningIcon()
+		</div>
+		<p class="text-md">Free shipping on orders over $20 for a limited time only.</p>
+	</div>
 }

@@ -9,7 +9,6 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import "github.com/Jalenarms1/sillysocks-GoTH/views/layouts"
-import "github.com/Jalenarms1/sillysocks-GoTH/views/icons"
 
 func Page() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -41,23 +40,7 @@ func Page() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex flex-col gap-2 p-4 min-h-screen\"><p class=\"text-3xl font-semibold\">Cart</p><div class=\"overflow-x-auto\"><table class=\"table table-xs\"><!-- head --><thead><tr><th><label><input type=\"checkbox\" class=\"checkbox\"></label></th><th></th><th>Name</th><th>Quantity</th><th>Total</th></tr></thead> <tbody><!-- row 1 --><tr><th><label><input type=\"checkbox\" class=\"checkbox\"></label></th><td><div class=\"flex items-center gap-3\"><div class=\"avatar\"><div class=\"mask mask-squircle h-12 w-12\"><img src=\"https://img.daisyui.com/images/profile/demo/2@94.webp\" alt=\"Avatar Tailwind CSS Component\"></div></div></div></td><td><span class=\"text-lg truncate\">Hart Hagerty</span></td><td><div class=\"flex items-center gap-2\"><div class=\"w-4 h-4 text-black\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = icons.MinusBtn().Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><p class=\"text-lg\">1</p><div class=\"w-4 h-4 text-black\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = icons.AddBtn().Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div></td><td class=\"text-lg\">$19.99</td></tr></tbody></table></div></div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<input type=\"hidden\" hx-get=\"/api/cart/items\" hx-target=\"#cart-items-list\" hx-trigger=\"load\" hx-swap=\"innerHTML\"><div class=\"flex flex-col gap-2 p-4 min-h-screen text-black\"><p class=\"text-3xl font-semibold mb-2\">Cart</p><div class=\"overflow-x-auto\"><table class=\"table table-xs overflow-x-hidden max-w-full\"><!-- head --><thead><tr class=\"text-black\"><th><label><input type=\"checkbox\" class=\"checkbox bg-white  border border-black\"></label></th><th></th><th>Name</th><th>Total</th></tr></thead> <tbody id=\"cart-items-list\" class=\"\"><!-- row 1 --></tbody></table><div class=\"flex w-full justify-end items-center\"></div></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

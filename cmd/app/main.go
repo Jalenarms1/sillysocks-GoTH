@@ -32,8 +32,8 @@ func main() {
 	workDir, _ := os.Getwd()
 	filesDir := http.Dir(filepath.Join(workDir, "public"))
 	FileServer(router, "/public", filesDir)
-
 	listenAddr := os.Getenv("LISTEN_ADDR")
+	fmt.Printf("%s\n", listenAddr)
 
 	handlers.RegisterRouter(router)
 

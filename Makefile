@@ -1,4 +1,4 @@
-build_dir=./bin/sillysocks-GoTH
+build_dir="./bin/sillysocks-GoTH.exe"
 
 tailwind:
 	@npx tailwindcss -i ./tailwind.css -o ./public/tailwind.css --watch
@@ -13,4 +13,4 @@ build:	templ
 	@go build -o $(build_dir) ./cmd/app
 
 watch: templ
-	@air --build.cmd "go build -o $(build_dir) ./cmd/app" --build.bin "$(build_dir)" --build.exclude_dir="node_modules" --build.include_dir="views/**/*"
+	@air --build.cmd "go build -o $(build_dir) ./cmd/app" --build.bin ".\bin\sillysocks-GoTH.exe" --build.exclude_dir="node_modules"
