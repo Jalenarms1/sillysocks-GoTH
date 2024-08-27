@@ -46,7 +46,6 @@ func DataGateway[T any](f func() ([]T, error)) []T {
 func GetSessionValues(r *http.Request) *sessions.Session {
 	var store = sessions.NewCookieStore([]byte(os.Getenv("SILLYSOCKS_SESSION_KEY")))
 
-	fmt.Println(os.Getenv("SILLYSOCKS_SESSION_KEY"))
 	session, err := store.Get(r, "sillysocks_cart")
 	if err != nil {
 		log.Fatal(err)

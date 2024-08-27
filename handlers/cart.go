@@ -22,14 +22,13 @@ func handleAddToCart(w http.ResponseWriter, r *http.Request) error {
 	if jsonErr != nil {
 		log.Fatal(jsonErr)
 	}
+  
 	fmt.Printf("\n%v\n", product)
-	// priceStr := r.FormValue("price")
+  
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	// price, _ := strconv.ParseFloat(priceStr, 64)
-
+  
 	cart := models.GetCart(w, r)
 
 	itemFound := false
@@ -64,10 +63,6 @@ func handleAddToCart(w http.ResponseWriter, r *http.Request) error {
 	if addErr != nil {
 		log.Fatal(addErr)
 	}
-
-	// fmt.Printf("%s\n", productId)
-	// fmt.Printf("%f\n", cart.SubTotal)
-	// fmt.Printf("%.2f\n", price)
 
 	w.Header().Set("HX-Trigger", "loadCartCount")
 
