@@ -1,7 +1,7 @@
 build_dir="./bin/sillysocks-GoTH.exe"
 
 tailwind:
-	@npx tailwindcss -i ./tailwind.css -o ./public/tailwind.css --watch
+	@npx tailwindcss -i ./tailwind.css -o ./public/tailwind.css
 
 templ:
 	@templ generate

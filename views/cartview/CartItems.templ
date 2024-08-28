@@ -15,32 +15,37 @@ templ CartItems(cartItems []models.CartItem) {
 				</label>
 			</th>
 			<td>
-				<div class="flex items-center gap-3">
-					<div class="avatar shadow-sm shadow-zinc-500 rounded-sm">
-						<div class="mask mask-squircle h-12 w-12 ">
+				<div class="flex items-center gap-1">
+					<div class="avatar shadow-sm shadow-zinc-300 rounded-sm">
+						<div class="mask mask-squircle h-12 w-12 rounded-sm">
 							<img
 								src={ ci.Product.Image }
 								alt="Avatar Tailwind CSS Component"
+								class="rounded-sm"
 							/>
 						</div>
 					</div>
 				</div>
 			</td>
 			<td>
-				<div class="flex flex-col w-4/5">
+				<div class="flex flex-col w-[95%] gap-2">
 					<span class="text-lg truncate ">{ ci.Product.Name }</span>
 					<div class="flex items-center gap-2">
 						<div class="w-4 h-4 text-black">
 							@icons.MinusBtn()
 						</div>
-						<p class="text-lg">{ icons.ConvStr(ci.Quantity) }</p>
-						<div class="w-4 h-4 text-black">
+						<p class="text-base">{ icons.ConvStr(ci.Quantity) }</p>
+						<div hx-put="/api/cart/count/increment" hx-vals={ ci.Product.ToJson() } hx-trigger="click" hx-target="#cart-items-list" hx-swap="innerHTML" class="w-4 h-4 text-black">
 							@icons.AddBtn()
 						</div>
 					</div>
 				</div>
 			</td>
-			<td class="text-lg">${ fmt.Sprintf("%.2f", ci.Price) }</td>
+			<td class="text-[16px] font-semibold flex items-start">
+				<div class="flex items-start">
+					${ fmt.Sprintf("%.2f", ci.Price) }
+				</div>
+			</td>
 		</tr>
 	}
 }

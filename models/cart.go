@@ -28,7 +28,15 @@ func (cart *Cart) NumOfItems() int {
 }
 
 func (cart *Cart) GetTotal() float64 {
-	return cart.SubTotal + cart.Tax
+	return cart.SubTotal + cart.Tax + cart.GetShippingCost()
+}
+
+func (cart *Cart) GetShippingCost() float64 {
+	if cart.SubTotal >= 20 {
+		return 0
+	}
+
+	return 5
 }
 
 func AddToCart(w http.ResponseWriter, r *http.Request, cart *Cart) error {

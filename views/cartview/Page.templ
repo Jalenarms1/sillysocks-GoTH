@@ -1,8 +1,11 @@
 package cartview
 
-import "github.com/Jalenarms1/sillysocks-GoTH/views/layouts"
+import (
+	"github.com/Jalenarms1/sillysocks-GoTH/models"
+	"github.com/Jalenarms1/sillysocks-GoTH/views/layouts"
+)
 
-templ Page() {
+templ Page(cart *models.Cart) {
 	@layouts.App() {
 		<input
 			type="hidden"
@@ -13,8 +16,8 @@ templ Page() {
 		/>
 		<div class="flex flex-col gap-2 p-4 min-h-screen text-black">
 			<p class="text-3xl font-semibold mb-2">Cart</p>
-			<div class="overflow-x-auto">
-				<table class="table table-xs overflow-x-hidden max-w-full">
+			<div class="overflow-x-hidden">
+				<table class="table table-xs  max-w-full">
 					<!-- head -->
 					<thead>
 						<tr class="text-black">
@@ -28,12 +31,21 @@ templ Page() {
 							<th>Total</th>
 						</tr>
 					</thead>
-					<tbody id="cart-items-list" class="">
+					<tbody id="cart-items-list" class="border-b border-zinc-300">
 						<!-- row 1 -->
 						// @CartItems()
 					</tbody>
 				</table>
-				<div class="flex w-full justify-end items-center"></div>
+				<div id="price-list" class="flex w-full justify-end items-center mt-3">
+					@PriceList(cart)
+				</div>
+				<input
+					type="hidden"
+					hx-get="/api/cart/price-list"
+					hx-target="#price-list"
+					hx-swap="innerHTML"
+					hx-trigger="loadPriceList from:body"
+				/>
 			</div>
 		</div>
 	}
