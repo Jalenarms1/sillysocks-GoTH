@@ -25,7 +25,7 @@ func main() {
 	fmt.Println("Hello World")
 
 	db.InitDB(os.Getenv("DB_CONN_STR"))
-	defer db.DB.Close()
+	defer db.CloseDB()
 
 	router := chi.NewMux()
 

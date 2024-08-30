@@ -5,15 +5,15 @@ import (
 	"github.com/Jalenarms1/sillysocks-GoTH/models"
 )
 
-templ PriceList(cart *models.Cart) {
-	<div class="flex flex-col w-2/4 gap-3">
+templ PriceList(cart models.Cart) {
+	<div class="flex flex-col w-full gap-3">
 		<div class="flex items-center justify-between">
 			<span class="font-semibold">Subtotal:</span>
-			<span>{ fmt.Sprintf("$ %.2f", cart.SubTotal) }</span>
+			<span>{ fmt.Sprintf("$ %.2f", cart.GetSubTotal()) }</span>
 		</div>
 		<div class="flex items-center justify-between">
 			<span class="font-semibold">Tax:</span>
-			<span>{ fmt.Sprintf("$ %.2f", cart.Tax) }</span>
+			<span>{ fmt.Sprintf("$ %.2f", cart.GetTax()) }</span>
 		</div>
 		<div class="flex items-center justify-between">
 			<span class="font-semibold">Shipping:</span>

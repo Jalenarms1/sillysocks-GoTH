@@ -3,10 +3,12 @@ package models
 import (
 	"log"
 	"time"
+
+	"github.com/gofrs/uuid"
 )
 
 type Order struct {
-	Id            string       `json:"id"`
+	Id            uuid.UUID    `json:"id"`
 	CustomerEmail string       `json:"customerEmail"`
 	CreatedAt     time.Time    `json:"createdAt"`
 	SubTotal      int64        `json:"total"`
@@ -16,13 +18,13 @@ type Order struct {
 }
 
 type OrderItem struct {
-	Id        string `json:"id"`
-	OrderId   string `json:"orderId"`
-	ProductId string `json:"productId"`
+	Id        uuid.UUID `json:"id"`
+	OrderId   string    `json:"orderId"`
+	ProductId string    `json:"productId"`
 }
 
 func NewOrder(order Order) *Order {
-	if order.Id == "" {
+	if order.Id == uuid.Nil {
 		newId, err := generateUUIDv4()
 		if err != nil {
 			log.Fatal(err)

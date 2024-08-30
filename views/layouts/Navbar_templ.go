@@ -36,7 +36,7 @@ func Navbar() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<ul tabindex=\"0\" class=\"menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow\"><li><a>Homepage</a></li><li><a>Portfolio</a></li><li><a>About</a></li></ul></div></div><div class=\"\"><a href=\"/\" class=\"btn btn-ghost\"><img src=\"/public/sockslogo.png\" alt=\"logo\" class=\"w-16 h-16\"></a></div><div id=\"nav-cart-icon\" class=\"text-black\"></div></div><input type=\"hidden\" hx-get=\"/api/cart/count\" hx-target=\"#nav-cart-icon\" hx-swap=\"innerHTML\" hx-trigger=\"load, loadCartCount from:body\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<ul tabindex=\"0\" class=\"menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow\"><li><a>Homepage</a></li><li><a>Portfolio</a></li><li><a>About</a></li></ul></div></div><div class=\"\"><a href=\"/\" class=\"btn btn-ghost\"><img src=\"/public/sockslogo.png\" alt=\"logo\" class=\"w-16 h-16\"></a></div><a href=\"/cart\" id=\"nav-cart-icon\" class=\"text-black\"></a></div><input type=\"hidden\" hx-get=\"/api/cart/count\" hx-target=\"#nav-cart-icon\" hx-swap=\"innerHTML\" hx-trigger=\"load, loadCartCount from:body\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

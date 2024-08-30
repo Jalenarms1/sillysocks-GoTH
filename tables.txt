@@ -1,0 +1,31 @@
+drop table if exists "CartItem"
+create table "CartItem" (
+	"Id" uuid primary key,
+	"ProductId" uuid not null,
+    "ProductName" varchar(250) not null,
+    "ProductImage" varchar(250) not null,
+    "ProductPrice" numeric(10,2) not null,
+	"CartId" uuid not null,
+	"Total" numeric(10,2) not null,
+	"Quantity" int not null,
+	foreign key ("ProductId") references "Product"("Id"),
+	foreign key ("CartId") references "Cart"("Id")
+)
+
+create table "Cart" (
+	"Id" uuid primary key,
+	"SubTotal" numeric(10,2) not null,
+	"Tax" numeric(10,2) not null
+)
+
+CREATE TABLE IF NOT EXISTS public."Product"
+(
+    "Id" uuid NOT NULL DEFAULT gen_random_uuid(),
+    "Name" character varying(250) COLLATE pg_catalog."default" NOT NULL,
+    "Description" text COLLATE pg_catalog."default",
+    "Category" character varying(200) COLLATE pg_catalog."default",
+    "Image" text COLLATE pg_catalog."default" NOT NULL,
+    "Price" numeric(10,2) NOT NULL,
+    "Quantity" integer NOT NULL,
+    CONSTRAINT "Product_pkey" PRIMARY KEY ("Id")
+)

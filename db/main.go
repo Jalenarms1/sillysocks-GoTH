@@ -1,17 +1,18 @@
 package db
 
 import (
-	"database/sql"
 	"log"
+
+	"github.com/jmoiron/sqlx"
 
 	_ "github.com/lib/pq"
 )
 
-var DB *sql.DB
+var DB *sqlx.DB
 
 func InitDB(connString string) {
 	var err error
-	DB, err = sql.Open("postgres", connString)
+	DB, err = sqlx.Connect("postgres", connString)
 
 	if err != nil {
 		log.Fatal(err)

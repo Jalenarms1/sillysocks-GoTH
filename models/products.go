@@ -6,16 +6,17 @@ import (
 	"log"
 
 	"github.com/Jalenarms1/sillysocks-GoTH/db"
+	"github.com/gofrs/uuid"
 )
 
 type Product struct {
-	Id          string  `json:"id"`
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Category    string  `json:"category"`
-	Image       string  `json:"image"`
-	Price       float64 `json:"price"`
-	Quantity    int     `json:"quantity"`
+	Id          uuid.UUID      `json:"id" db:"Id"`
+	Name        string         `json:"name" db:"Name"`
+	Description sql.NullString `json:"description" db:"Description"`
+	Category    sql.NullString `json:"category" db:"Category"`
+	Image       string         `json:"image" db:"Image"`
+	Price       float64        `json:"price" db:"Price"`
+	Quantity    int32          `json:"quantity" db:"Quantity"`
 }
 
 func (product *Product) ToJson() string {
@@ -25,7 +26,7 @@ func (product *Product) ToJson() string {
 }
 
 func NewProduct(product Product) *Product {
-	if product.Id == "" {
+	if product.Id == uuid.Nil {
 		newId, err := generateUUIDv4()
 		if err != nil {
 			log.Fatal(err)
@@ -80,26 +81,12 @@ func DeleteProduct(productId string) error {
 }
 
 func GetProducts() ([]Product, error) {
-	rows, err := db.DB.Query(`select * from "Product"`)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
 	var products []Product
-
-	for rows.Next() {
-		var p Product
-
-		if err := rows.Scan(&p.Id, &p.Name, &p.Description, &p.Category, &p.Image, &p.Price, &p.Quantity); err != nil {
-			return nil, err
-		}
-
-		products = append(products, p)
-
-	}
-
-	if err := rows.Err(); err != nil {
+	query := `
+		select * from "Product"
+	`
+	err := db.DB.Select(&products, query)
+	if err != nil {
 		return nil, err
 	}
 

@@ -17,7 +17,7 @@ func handleGetProducts(w http.ResponseWriter, r *http.Request) error {
 	// cart.Values["cart"] = models.Cart{}
 	// saveErr := cart.Save(r, w)
 	// if saveErr != nil {
-	// 	log.Fatal((saveErr))
+	// 	log.Fatal(saveErr)
 	// }
 	// fmt.Print(cart.Values["cart"])
 	Render(w, r, home.CatalogSlides(ps))

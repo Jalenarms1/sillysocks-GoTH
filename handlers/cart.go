@@ -4,16 +4,28 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"math"
 	"net/http"
-	"strconv"
+	"strings"
 
 	"github.com/Jalenarms1/sillysocks-GoTH/models"
 	"github.com/Jalenarms1/sillysocks-GoTH/views/cartview"
 	"github.com/Jalenarms1/sillysocks-GoTH/views/home"
 	"github.com/Jalenarms1/sillysocks-GoTH/views/icons"
 	"github.com/go-chi/chi/v5"
+	"github.com/gofrs/uuid"
 )
+
+func RegisterCartRouter(router *chi.Mux) {
+	router.Get("/cart", UseHTTPHandler(handleCartPage))
+	router.Post("/api/cart/add", UseHTTPHandler(handleAddToCart))
+	router.Get("/api/cart/count", UseHTTPHandler(handleGetCartCount))
+	router.Put("/api/cart/count/increment", UseHTTPHandler(handleCartItemIncr))
+	router.Put("/api/cart/count/decrement", UseHTTPHandler(handleCartItemDecr))
+	router.Get("/api/cart/total", UseHTTPHandler(handleGetCartTotal))
+	router.Get("/api/cart/items", UseHTTPHandler(handleGetCartItems))
+	router.Put("/api/cart/items/delete", UseHTTPHandler(handleDeleteCartItems))
+	router.Get("/api/cart/price-list", UseHTTPHandler(handleGetCartPriceList))
+}
 
 func handleAddToCart(w http.ResponseWriter, r *http.Request) error {
 	err := r.ParseForm()
@@ -24,8 +36,6 @@ func handleAddToCart(w http.ResponseWriter, r *http.Request) error {
 		log.Fatal(jsonErr)
 	}
 
-	fmt.Printf("\n%v\n", product)
-
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,36 +43,30 @@ func handleAddToCart(w http.ResponseWriter, r *http.Request) error {
 	cart := models.GetCart(w, r)
 
 	itemFound := false
-	for i, ci := range cart.CartItems {
-		if ci.Product.Id == product.Id {
-			cart.CartItems[i].Quantity += 1
-			cart.CartItems[i].Price = ci.Product.Price * float64(cart.CartItems[i].Quantity)
-			cart.SubTotal = math.Round((cart.SubTotal+ci.Product.Price)*100) / 100
-			cart.Tax = math.Round((cart.SubTotal*1.08-cart.SubTotal)*100) / 100
+	for i, ci := range cart {
+		if ci.ProductId == product.Id {
+			cart[i].Quantity += 1
+			cart[i].Total = ci.Product.Price * float64(cart[i].Quantity)
 			itemFound = true
-
-			fmt.Printf("%.2f", ci.Price)
 
 			break
 		}
 	}
 
 	if !itemFound {
-		fmt.Println("Item not found")
 		cartItem := models.CartItem{
-			Product:  product,
-			Price:    product.Price,
-			Quantity: 1,
+			Product:   product,
+			ProductId: product.Id,
+			Total:     product.Price,
+			Quantity:  1,
 		}
-		cart.SubTotal = math.Round((cart.SubTotal+product.Price)*100) / 100
-		cart.Tax = math.Round((cart.SubTotal*1.08-cart.SubTotal)*100) / 100
 
-		cart.CartItems = append(cart.CartItems, cartItem)
+		cart = append(cart, cartItem)
 	}
 
-	addErr := models.AddToCart(w, r, cart)
+	addErr := models.AddToCart(&product)
 	if addErr != nil {
-		log.Fatal(addErr)
+		http.Error(w, addErr.Error(), http.StatusBadRequest)
 	}
 
 	w.Header().Set("HX-Trigger", "loadCartCount")
@@ -84,14 +88,8 @@ func handleGetCartCount(w http.ResponseWriter, r *http.Request) error {
 
 func handleGetCartTotal(w http.ResponseWriter, r *http.Request) error {
 	cart := models.GetCart(w, r)
-	// var total float64
-	// if cart == nil {
-	// 	total = 0
-	// } else {
-	// 	total = cart.GetTotal()
 
-	// }
-	fmt.Fprint(w, fmt.Sprintf("$%.2f", cart.SubTotal))
+	fmt.Fprint(w, fmt.Sprintf("$%.2f", cart.GetSubTotal()))
 
 	return nil
 }
@@ -103,41 +101,39 @@ func handleCartPage(w http.ResponseWriter, r *http.Request) error {
 
 func handleGetCartItems(w http.ResponseWriter, r *http.Request) error {
 	cart := models.GetCart(w, r)
-	return Render(w, r, cartview.CartItems(cart.CartItems))
+	return Render(w, r, cartview.CartItems(cart))
 }
 
 func handleCartItemIncr(w http.ResponseWriter, r *http.Request) error {
-	var product models.Product
+	var cartItem models.CartItem
+	var cart models.Cart
 	r.ParseForm()
-	fmt.Printf("%s", r.FormValue("id"))
-	product.Id = r.FormValue("id")
-	price, cnvErr := strconv.ParseFloat(r.FormValue("price"), 64)
-	if cnvErr != nil {
-		log.Fatal(cnvErr)
-		return cnvErr
+	cartData := r.FormValue("data")
+	fmt.Printf("\nCartFormData:\n%s\n", cartData)
+	idToUpd := uuid.FromStringOrNil(r.URL.Query().Get("cartItemId"))
+	if err := models.GetCartItem(idToUpd, &cartItem); err != nil {
+		return err
 	}
-	product.Price = price
-	cart := models.GetCart(w, r)
+	if err := json.Unmarshal([]byte(cartData), &cart); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
 
-	for i, it := range cart.CartItems {
-		if it.Product.Id == product.Id {
-			cart.CartItems[i].Quantity += 1
-			cart.CartItems[i].Price = float64(cart.CartItems[i].Quantity) * product.Price
-			cart.SubTotal += product.Price
-			cart.Tax = cart.SubTotal*1.08 - cart.SubTotal
+	for i, ci := range cart {
+		if ci.Id == idToUpd {
+			cart[i].Quantity++
+			cart[i].Total = cart[i].Product.Price * float64(cart[i].Quantity)
 		}
 	}
 
-	err := models.AddToCart(w, r, cart)
+	err := cart.Save()
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
-	// loadCartCount
-	w.Header().Set("HX-Trigger", `{"loadPriceList": "loadPriceList", "loadCartCount": "loadCartCount"}`)
 
-	return Render(w, r, cartview.CartItems(cart.CartItems))
+	w.Header().Set("HX-Trigger", `{"loadPriceList": "loadPriceList", "loadCartCount": "loadCartCount"}`)
+	return Render(w, r, cartview.CartItems(cart))
 }
+
 func handleCartItemDecr(w http.ResponseWriter, r *http.Request) error {
 	var product models.Product
 
@@ -149,20 +145,18 @@ func handleCartItemDecr(w http.ResponseWriter, r *http.Request) error {
 
 	cart := models.GetCart(w, r)
 
-	for i, it := range cart.CartItems {
+	for i, it := range cart {
 		if it.Product.Id == product.Id {
-			cart.CartItems[i].Quantity -= 1
-			cart.CartItems[i].Price = float64(cart.CartItems[i].Quantity) * product.Price
-			cart.SubTotal -= product.Price
-			cart.Tax = cart.SubTotal*1.08 - cart.SubTotal
+			cart[i].Quantity -= 1
+			cart[i].Total = float64(cart[i].Quantity) * product.Price
 		}
 	}
 
-	err := models.AddToCart(w, r, cart)
-	if err != nil {
-		log.Fatal(err)
-		return err
-	}
+	// err := models.AddToCart(w, r, &cart)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// 	return err
+	// }
 
 	w.Header().Set("HX-Trigger", "loadPriceList")
 
@@ -171,17 +165,35 @@ func handleCartItemDecr(w http.ResponseWriter, r *http.Request) error {
 
 func handleGetCartPriceList(w http.ResponseWriter, r *http.Request) error {
 	cart := models.GetCart(w, r)
-	fmt.Printf("%v", cart)
 	return Render(w, r, cartview.PriceList(cart))
 }
 
-func RegisterCartRouter(router *chi.Mux) {
-	router.Get("/cart", UseHTTPHandler(handleCartPage))
-	router.Post("/api/cart/add", UseHTTPHandler(handleAddToCart))
-	router.Get("/api/cart/count", UseHTTPHandler(handleGetCartCount))
-	router.Put("/api/cart/count/increment", UseHTTPHandler(handleCartItemIncr))
-	router.Put("/api/cart/count/decrement", UseHTTPHandler(handleCartItemDecr))
-	router.Get("/api/cart/total", UseHTTPHandler(handleGetCartTotal))
-	router.Get("/api/cart/items", UseHTTPHandler(handleGetCartItems))
-	router.Get("/api/cart/price-list", UseHTTPHandler(handleGetCartPriceList))
+func handleDeleteCartItems(w http.ResponseWriter, r *http.Request) error {
+	cart := models.GetCart(w, r)
+	r.ParseForm()
+	productIds := strings.Split(r.FormValue("productIds")[1:], ",")
+	var newCartItems models.Cart
+	for _, ci := range cart {
+		idFound := false
+		for _, id := range productIds {
+			uid, _ := uuid.FromString(id)
+			if uid == ci.Product.Id {
+				idFound = true
+			}
+		}
+
+		if !idFound {
+			newCartItems = append(newCartItems, ci)
+
+		} else {
+		}
+	}
+
+	cart = newCartItems
+
+	// models.AddToCart(w, r, &cart)
+
+	w.Header().Set("HX-Trigger", `{"loadPriceList": "", "loadCartCount": ""}`)
+
+	return Render(w, r, cartview.CartItems(cart))
 }

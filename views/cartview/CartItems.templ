@@ -6,12 +6,17 @@ import (
 	"github.com/Jalenarms1/sillysocks-GoTH/views/icons"
 )
 
-templ CartItems(cartItems []models.CartItem) {
-	for _, ci := range cartItems {
+templ CartItems(cart models.Cart) {
+	if len(cart) == 0 {
+		<div class="p-3">
+			<button type="button" class="btn btn-outline text-black">Shop now</button>
+		</div>
+	}
+	for _, ci := range cart {
 		<tr class="p-4">
 			<th>
 				<label>
-					<input type="checkbox" class="checkbox bg-white  border border-black"/>
+					<input id={ ci.Product.Id.String() } type="checkbox" class="checkbox bg-white  border border-black"/>
 				</label>
 			</th>
 			<td>
@@ -35,16 +40,14 @@ templ CartItems(cartItems []models.CartItem) {
 							@icons.MinusBtn()
 						</div>
 						<p class="text-base">{ icons.ConvStr(ci.Quantity) }</p>
-						<div hx-put="/api/cart/count/increment" hx-vals={ ci.Product.ToJson() } hx-trigger="click" hx-target="#cart-items-list" hx-swap="innerHTML" class="w-4 h-4 text-black">
+						<div hx-put={ fmt.Sprintf("/api/cart/count/increment?cartItemId=%s", ci.Id) } hx-vals={ fmt.Sprintf(`{"data": %s}`, cart.ToJson()) } hx-trigger="click" hx-target="#cart-items-list" hx-swap="innerHTML" class="w-4 h-4 text-black">
 							@icons.AddBtn()
 						</div>
 					</div>
 				</div>
 			</td>
-			<td class="text-[16px] font-semibold flex items-start">
-				<div class="flex items-start">
-					${ fmt.Sprintf("%.2f", ci.Price) }
-				</div>
+			<td class="text-base font-semibold ">
+				${ fmt.Sprintf("%.2f", ci.Product.Price * float64(ci.Quantity)) }
 			</td>
 		</tr>
 	}
