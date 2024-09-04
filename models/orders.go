@@ -1,44 +1,54 @@
 package models
 
 import (
-	"log"
 	"time"
 
 	"github.com/gofrs/uuid"
 )
 
 type Order struct {
-	Id            uuid.UUID    `json:"id"`
-	CustomerEmail string       `json:"customerEmail"`
-	CreatedAt     time.Time    `json:"createdAt"`
-	SubTotal      int64        `json:"total"`
-	Tax           int64        `json:"tax"`
-	Shipped       bool         `json:"shipped"`
-	OrderItems    *[]OrderItem `json:"orderItems"`
+	Id                uuid.UUID    `json:"id" db:"Id"`
+	CstId             string       `json:"cstId" db:"CstId"`
+	PmtIntId          string       `json:"pmtIntId" db:"PmtIntId"`
+	CustomerEmail     string       `json:"customerEmail" db:"CustomerEmail"`
+	CustomerName      string       `json:"customerName" db:"CustomerName"`
+	CreatedAt         time.Time    `json:"createdAt" db:"CreatedAt"`
+	SubTotal          float64      `json:"total" db:"Total"`
+	Tax               float64      `json:"tax" db:"Tax"`
+	Shipping          float64      `json:"shipping" db:"Shipping"`
+	ShippingAddrLine1 string       `json:"shippingAddrLine1" db:"ShippingAddrLine1"`
+	ShippingAddrLine2 string       `json:"shippingAddrLine2" db:"ShippingAddrLine2"`
+	ShippingAddrCity  string       `json:"shippingAddrCity" db:"ShippingAddrCity"`
+	ShippingAddrState string       `json:"shippingAddrState" db:"ShippingAddrState"`
+	ShippingAddrZip   string       `json:"shippingAddrZip" db:"ShippingAddrZip"`
+	Shipped           bool         `json:"shipped" db:"Shipped"`
+	OrderItems        *[]OrderItem `json:"orderItems"`
 }
 
 type OrderItem struct {
-	Id        uuid.UUID `json:"id"`
-	OrderId   string    `json:"orderId"`
-	ProductId string    `json:"productId"`
+	Id        uuid.UUID `json:"id" db:"Id"`
+	OrderId   string    `json:"orderId" db:"OrderId"`
+	ProductId string    `json:"productId" db:"ProductId"`
 }
 
-func NewOrder(order Order) *Order {
-	if order.Id == uuid.Nil {
-		newId, err := generateUUIDv4()
-		if err != nil {
-			log.Fatal(err)
-		}
-		order.Id = newId
-	}
+func NewOrder(cstId, pmtId, cstEmail, cstName, shpAddr1, shpAddr2, shpAddrCity, shpAddrState, shpAddrZip string, subTotal, tax, shipping float64) *Order {
+	newId, _ := generateUUIDv4()
 
 	return &Order{
-		Id:            order.Id,
-		CustomerEmail: order.CustomerEmail,
-		SubTotal:      order.SubTotal,
-		Tax:           order.Tax,
-		Shipped:       order.Shipped,
-		CreatedAt:     order.CreatedAt,
+		Id:                newId,
+		CstId:             cstId,
+		PmtIntId:          pmtId,
+		CustomerEmail:     cstEmail,
+		CustomerName:      cstName,
+		SubTotal:          subTotal,
+		Tax:               tax,
+		Shipping:          shipping,
+		ShippingAddrLine1: shpAddr1,
+		ShippingAddrLine2: shpAddr2,
+		ShippingAddrCity:  shpAddrCity,
+		ShippingAddrState: shpAddrState,
+		ShippingAddrZip:   shpAddrZip,
+		CreatedAt:         time.Now(),
 	}
 }
 

@@ -3,12 +3,9 @@ package models
 import (
 	"database/sql"
 	"log"
-	"net/http"
-	"os"
 	"reflect"
 
 	"github.com/gofrs/uuid"
-	"github.com/gorilla/sessions"
 )
 
 func generateUUIDv4() (uuid.UUID, error) {
@@ -42,19 +39,6 @@ func DataGateway[T any](f func() ([]T, error)) []T {
 	}
 
 	return data
-}
-
-// var store = sessions.NewCookieStore([]byte(os.Getenv("SILLYSOCKS_SESSION_KEY")))
-
-func GetSessionValues(r *http.Request) *sessions.Session {
-	var store = sessions.NewCookieStore([]byte(os.Getenv("SILLYSOCKS_SESSION_KEY")))
-
-	session, err := store.Get(r, "sillysocks_cart")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return session
 }
 
 func ScanStruct(rows *sql.Rows, dest interface{}) error {

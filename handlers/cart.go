@@ -96,7 +96,10 @@ func handleGetCartTotal(w http.ResponseWriter, r *http.Request) error {
 
 func handleCartPage(w http.ResponseWriter, r *http.Request) error {
 	cart := models.GetCart(w, r)
-	return Render(w, r, cartview.Page(cart))
+
+	orderStatus := r.URL.Query().Get("orderStatus")
+
+	return Render(w, r, cartview.Page(cart, orderStatus))
 }
 
 func handleGetCartItems(w http.ResponseWriter, r *http.Request) error {
@@ -124,7 +127,6 @@ func handleCartItemIncr(w http.ResponseWriter, r *http.Request) error {
 			cart[i].Total = cart[i].Product.Price * float64(cart[i].Quantity)
 		}
 	}
-
 	err := cart.Save()
 	if err != nil {
 		return err
@@ -135,32 +137,40 @@ func handleCartItemIncr(w http.ResponseWriter, r *http.Request) error {
 }
 
 func handleCartItemDecr(w http.ResponseWriter, r *http.Request) error {
-	var product models.Product
-
-	jsonErr := json.NewDecoder(r.Body).Decode(&product)
-	if jsonErr != nil {
-		log.Fatal(jsonErr)
-		return jsonErr
+	var cartItem models.CartItem
+	var cart models.Cart
+	r.ParseForm()
+	cartData := r.FormValue("data")
+	idToUpd := uuid.FromStringOrNil(r.URL.Query().Get("cartItemId"))
+	if err := models.GetCartItem(idToUpd, &cartItem); err != nil {
+		return err
 	}
+	if err := json.Unmarshal([]byte(cartData), &cart); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+	var newCart models.Cart
+	for i, ci := range cart {
+		if ci.Id == idToUpd {
+			cart[i].Quantity--
+			cart[i].Total = cart[i].Product.Price * float64(cart[i].Quantity)
 
-	cart := models.GetCart(w, r)
+			if cart[i].Quantity > 0 {
+				newCart = append(newCart, cart[i])
+			}
+		} else {
 
-	for i, it := range cart {
-		if it.Product.Id == product.Id {
-			cart[i].Quantity -= 1
-			cart[i].Total = float64(cart[i].Quantity) * product.Price
+			newCart = append(newCart, ci)
 		}
+
+	}
+	cart = newCart
+	err := cart.Save()
+	if err != nil {
+		return err
 	}
 
-	// err := models.AddToCart(w, r, &cart)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// 	return err
-	// }
-
-	w.Header().Set("HX-Trigger", "loadPriceList")
-
-	return Render(w, r, cartview.Page(cart))
+	w.Header().Set("HX-Trigger", `{"loadPriceList": "loadPriceList", "loadCartCount": "loadCartCount"}`)
+	return Render(w, r, cartview.CartItems(cart))
 }
 
 func handleGetCartPriceList(w http.ResponseWriter, r *http.Request) error {
@@ -171,13 +181,13 @@ func handleGetCartPriceList(w http.ResponseWriter, r *http.Request) error {
 func handleDeleteCartItems(w http.ResponseWriter, r *http.Request) error {
 	cart := models.GetCart(w, r)
 	r.ParseForm()
-	productIds := strings.Split(r.FormValue("productIds")[1:], ",")
+	cartItemIds := strings.Split(r.FormValue("cartItemIds")[1:], ",")
 	var newCartItems models.Cart
 	for _, ci := range cart {
 		idFound := false
-		for _, id := range productIds {
+		for _, id := range cartItemIds {
 			uid, _ := uuid.FromString(id)
-			if uid == ci.Product.Id {
+			if uid == ci.Id {
 				idFound = true
 			}
 		}
@@ -190,6 +200,11 @@ func handleDeleteCartItems(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	cart = newCartItems
+
+	err := cart.Save()
+	if err != nil {
+		return err
+	}
 
 	// models.AddToCart(w, r, &cart)
 

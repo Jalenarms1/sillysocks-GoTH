@@ -33,16 +33,16 @@ const listCont = document.getElementById("cart-items-list")
 		}
 		listCont.addEventListener("click", (e) => {
 			if (e.target.classList.contains("checkbox")) {
-				const productId = e.target.id
+				const cartItemId = e.target.id
 				const currIds = writeToDel.value.split(",")
 				if (e.target.checked) {
-					if (!currIds.includes(productId)) {
-						currIds.push(productId)
+					if (!currIds.includes(cartItemId)) {
+						currIds.push(cartItemId)
 						writeToDel.value = currIds.join(",")
 
 					}
 				} else {
-					const newIds = currIds.filter(id => id != productId)
+					const newIds = currIds.filter(id => id != cartItemId)
 
 					writeToDel.value = newIds.join(",")
 				}

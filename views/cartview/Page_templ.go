@@ -14,7 +14,7 @@ import (
 	"github.com/Jalenarms1/sillysocks-GoTH/views/layouts"
 )
 
-func Page(cart models.Cart) templ.Component {
+func Page(cart models.Cart, orderStatus string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -44,43 +44,42 @@ func Page(cart models.Cart) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<input type=\"hidden\" hx-get=\"/api/cart/items\" hx-target=\"#cart-items-list\" hx-trigger=\"load\" hx-swap=\"innerHTML\"><div class=\"flex flex-col gap-2 p-4 min-h-screen text-black\"><div class=\"flex justify-between items-center\"><p class=\"text-3xl font-semibold mb-2\">Cart</p><div id=\"delete-items\" hx-put=\"/api/cart/items/delete\" hx-trigger=\"click\" hx-include=\"#del-ids\" hx-target=\"#cart-items-list\" hx-on=\"htmx:afterRequest:document.getElementById(&#39;check-all&#39;).checked=false\" class=\" w-8 h-8 bg-red-500 rounded-md text-white p-1 hidden\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = icons.TrashCan().Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div><div class=\"overflow-x-hidden max-h-[60vh] overflow-y-scroll shadow-sm shadow-zinc-400 \"><table class=\"table table-xs  max-w-full \"><!-- head --><thead><tr class=\"text-black\"><th>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			if len(cart) > 0 {
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<label><input id=\"check-all\" type=\"checkbox\" class=\"checkbox bg-white  border border-black\"></label>")
+			if orderStatus != "success" {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<input type=\"hidden\" hx-get=\"/api/cart/items\" hx-target=\"#cart-items-list\" hx-trigger=\"load\" hx-swap=\"innerHTML\"><div class=\"flex flex-col gap-2 p-4 min-h-screen text-black\"><div class=\"flex justify-between items-center\"><div class=\"flex flex-col gap-2 mb-2\"><p class=\"text-3xl font-semibold \">Cart</p>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</th><th></th><th>Name</th><th>Total</th></tr></thead> <tbody id=\"cart-items-list\" class=\"border-b border-zinc-300\"><!-- row 1 --></tbody></table></div><div class=\"flex items-end justify-between gap-5\"><div id=\"price-list\" class=\"flex w-1/2 items-center mt-3\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = PriceList(cart).Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><div class=\"flex items-center w-1/2\"><button class=\"btn btn-warning flex items-center w-full\"><div class=\"w-6 h-6\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = icons.ShoppingBag().Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><span class=\"text-base\">Checkout</span></button></div></div><input type=\"hidden\" hx-get=\"/api/cart/price-list\" hx-target=\"#price-list\" hx-swap=\"innerHTML\" hx-trigger=\"loadPriceList from:body\"> <input type=\"hidden\" id=\"del-ids\" name=\"productIds\" value=\"\"></div>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
+				if orderStatus == "canceled" {
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<p class=\"text-base text-red-500\">Your checkout session has been canceled.</p>")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><div id=\"delete-items\" hx-put=\"/api/cart/items/delete\" hx-trigger=\"click\" hx-include=\"#del-ids\" hx-target=\"#cart-items-list\" hx-on=\"htmx:afterRequest:document.getElementById(&#39;check-all&#39;).checked=false\" class=\" w-8 h-8 bg-red-500 rounded-md text-white p-1 hidden\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = icons.TrashCan().Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div><div id=\"cart-items-list\" class=\"overflow-x-hidden max-h-[60vh] overflow-y-scroll   \"></div><div id=\"price-list\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = PriceList(cart).Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><input type=\"hidden\" hx-get=\"/api/cart/price-list\" hx-target=\"#price-list\" hx-swap=\"innerHTML\" hx-trigger=\"loadPriceList from:body\"> <input type=\"hidden\" id=\"del-ids\" name=\"cartItemIds\" value=\"\"></div>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			} else {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"w-full flex flex-col min-h-screen p-4\"><div class=\"bg-green-400 text-green-800 p-3 rounded-md \"><p class=\"text-lg\"><span class=\" font-semibold\">Order successful!</span> A confirmation email has been sent to your provided email address. Thanks for shopping with Silly Socks and More!</p></div></div>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
 			}
 			return templ_7745c5c3_Err
 		})

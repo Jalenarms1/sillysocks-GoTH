@@ -9,46 +9,83 @@ import (
 templ CartItems(cart models.Cart) {
 	if len(cart) == 0 {
 		<div class="p-3">
-			<button type="button" class="btn btn-outline text-black">Shop now</button>
+			<a href="/" class="btn btn-outline text-black">Shop now</a>
 		</div>
+	} else {
+
+		<table class="table table-xs  max-w-full ">
+			<!-- head -->
+			<thead>
+				<tr class="text-black">
+					<th>
+						if len(cart) > 0 {
+							<label>
+								<input id="check-all" type="checkbox" class="checkbox bg-white  border border-black"/>
+							</label>
+						}
+					</th>
+					<th></th>
+					<th>Name</th>
+					<th>Total</th>
+				</tr>
+			</thead>
+			<tbody  class="border-b border-zinc-300 p-5">
+				for _, ci := range cart {
+					<tr class="px-3">
+						<th>
+							<label>
+								<input id={ ci.Id.String() } type="checkbox" class="checkbox bg-white  border border-black"/>
+							</label>
+						</th>
+						<td>
+							<div class="flex items-center gap-1">
+								<div class="avatar shadow-sm shadow-zinc-300 rounded-sm">
+									<div class="mask mask-squircle h-10 w-10 rounded-sm">
+										<img
+											src={ ci.Product.Image }
+											alt="Avatar Tailwind CSS Component"
+											class="rounded-sm"
+										/>
+									</div>
+								</div>
+							</div>
+						</td>
+						<td class="">
+							<div class="flex flex-col gap-2">
+								<span class="text-base truncate">{ ci.Product.Name }</span>
+								<div class="flex items-center gap-2">
+									<div 
+										hx-put={ fmt.Sprintf("/api/cart/count/decrement?cartItemId=%s", ci.Id) } 
+										hx-include="#cart-json" 
+										hx-trigger="click" 
+										hx-target="#cart-items-list" 
+										hx-swap="innerHTML"
+										class="w-4 h-4 text-black"
+									>
+										@icons.MinusBtn()
+									</div>
+									<p class="text-base">{ icons.ConvStr(ci.Quantity) }</p>
+									<div 
+										hx-put={ fmt.Sprintf("/api/cart/count/increment?cartItemId=%s", ci.Id) } 
+										hx-include="#cart-json" 
+										hx-trigger="click" 
+										hx-target="#cart-items-list" 
+										hx-swap="innerHTML" 
+										class="w-4 h-4 text-black"
+									>
+										@icons.AddBtn()
+									</div>
+								</div>
+							</div>
+						</td>
+						<td class="text-base font-semibold ">
+							${ fmt.Sprintf("%.2f", ci.Product.Price * float64(ci.Quantity)) }
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
 	}
-	for _, ci := range cart {
-		<tr class="p-4">
-			<th>
-				<label>
-					<input id={ ci.Product.Id.String() } type="checkbox" class="checkbox bg-white  border border-black"/>
-				</label>
-			</th>
-			<td>
-				<div class="flex items-center gap-1">
-					<div class="avatar shadow-sm shadow-zinc-300 rounded-sm">
-						<div class="mask mask-squircle h-12 w-12 rounded-sm">
-							<img
-								src={ ci.Product.Image }
-								alt="Avatar Tailwind CSS Component"
-								class="rounded-sm"
-							/>
-						</div>
-					</div>
-				</div>
-			</td>
-			<td>
-				<div class="flex flex-col w-[95%] gap-2">
-					<span class="text-lg truncate ">{ ci.Product.Name }</span>
-					<div class="flex items-center gap-2">
-						<div class="w-4 h-4 text-black">
-							@icons.MinusBtn()
-						</div>
-						<p class="text-base">{ icons.ConvStr(ci.Quantity) }</p>
-						<div hx-put={ fmt.Sprintf("/api/cart/count/increment?cartItemId=%s", ci.Id) } hx-vals={ fmt.Sprintf(`{"data": %s}`, cart.ToJson()) } hx-trigger="click" hx-target="#cart-items-list" hx-swap="innerHTML" class="w-4 h-4 text-black">
-							@icons.AddBtn()
-						</div>
-					</div>
-				</div>
-			</td>
-			<td class="text-base font-semibold ">
-				${ fmt.Sprintf("%.2f", ci.Product.Price * float64(ci.Quantity)) }
-			</td>
-		</tr>
-	}
+	<input type="hidden" id="cart-json" name="data" value={cart.ToJson()}  />
+
 }

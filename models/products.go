@@ -16,6 +16,7 @@ type Product struct {
 	Category    sql.NullString `json:"category" db:"Category"`
 	Image       string         `json:"image" db:"Image"`
 	Price       float64        `json:"price" db:"Price"`
+	PriceId     string         `json:"priceId" db:"PriceId"`
 	Quantity    int32          `json:"quantity" db:"Quantity"`
 }
 

@@ -3,8 +3,8 @@ package models
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"log"
+	"math"
 	"net/http"
 
 	"github.com/Jalenarms1/sillysocks-GoTH/db"
@@ -16,7 +16,7 @@ type CartItem struct {
 	Product   Product   `json:"product"`
 	ProductId uuid.UUID `json:"productId" db:"ProductId"`
 	Total     float64   `json:"total" db:"Total"`
-	Quantity  int32     `json:"quantity" db:"Quantity"`
+	Quantity  int64     `json:"quantity" db:"Quantity"`
 }
 
 type Cart []CartItem
@@ -41,11 +41,8 @@ func (ci *CartItem) ToJson() string {
 }
 
 func (c *Cart) ToJson() string {
-	fmt.Printf("\n\n\n")
-	fmt.Printf("%v\n", c)
 	bytes, _ := json.Marshal(c)
 
-	fmt.Printf("\n%s", string(bytes))
 	return string(bytes)
 }
 
@@ -63,14 +60,42 @@ func (ci *CartItem) insert() error {
 }
 
 func (c *Cart) Save() error {
-	query := `
-		delete from "CartItem";
-		insert into "CartItem" ("Id", "ProductId", "Total", "Quantity") values (:Id, :ProductId, :Total, :Quantity);
-	`
+	itemMaps := make([]map[string]interface{}, len(*c))
+	for i, item := range *c {
+		itemMaps[i] = map[string]interface{}{
+			"Id":        item.Id,
+			"ProductId": item.ProductId,
+			"Total":     item.Total,
+			"Quantity":  item.Quantity,
+		}
+	}
 
-	_, err := db.DB.NamedExec(query, c)
+	tx, err := db.DB.Beginx()
 	if err != nil {
 		return err
+	}
+	defer tx.Rollback()
+
+	_, delErr := tx.Exec(`delete from "CartItem";`)
+	if delErr != nil {
+		return delErr
+	}
+
+	query := `
+        insert into "CartItem" ("Id", "ProductId", "Total", "Quantity")
+        values (:Id, :ProductId, :Total, :Quantity);
+    `
+	if len(itemMaps) > 0 {
+		_, insErr := tx.NamedExec(query, itemMaps)
+		if insErr != nil {
+			return err
+		}
+
+	}
+
+	cmErr := tx.Commit()
+	if cmErr != nil {
+		return cmErr
 	}
 
 	return nil
@@ -101,22 +126,24 @@ func (cart *Cart) NumOfItems() int {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("\nNumber of items: %d\n", count)
-
 	return count
 }
 
 func (cart *Cart) GetTax() float64 {
-	sbt := cart.GetSubTotal()
-	return sbt*1.08 - sbt
+	var tax float64
+
+	for _, ci := range *cart {
+		sbt := ci.Product.Price * float64(ci.Quantity)
+		itemTax := math.Round((sbt*1.08-sbt)*100) / 100
+		tax += itemTax
+	}
+
+	return tax
 }
 
 func (cart *Cart) GetTotal() float64 {
-	var total float64
-	for _, ci := range *cart {
-		total += ci.Product.Price * float64(ci.Quantity)
-	}
-	return total + (total*1.08 - total) + cart.GetShippingCost()
+
+	return cart.GetSubTotal() + cart.GetTax() + cart.GetShippingCost()
 }
 
 func (cart *Cart) GetSubTotal() float64 {
@@ -149,7 +176,7 @@ func AddToCart(product *Product) error {
 	// `)
 	var cartItem CartItem
 	if err := GetCartItem(product.Id, &cartItem); err != nil {
-		return err
+		cartItem = CartItem{}
 	}
 
 	if cartItem.Id == uuid.Nil {
@@ -222,24 +249,35 @@ func GetCart(w http.ResponseWriter, r *http.Request) Cart {
 			Product:   *product,
 			ProductId: r.ProductId,
 			Total:     r.Total,
-			Quantity:  r.Quantity,
+			Quantity:  int64(r.Quantity),
 		}
 
 		cart = append(cart, *cartItem)
 	}
 
-	fmt.Printf("Cart: %v", cart)
-
 	return cart
 
 }
 
-func GetCartItem(productId uuid.UUID, ci *CartItem) error {
+type CartItemResp struct {
+	Id        uuid.UUID `db:"Id"`
+	ProductId uuid.UUID `db:"ProductId"`
+	Total     float64   `db:"Total"`
+	Quantity  int32     `db:"Quantity"`
+}
 
-	err := db.DB.Get(&ci, `select * from "CartItem" where "ProductId" = $1`, productId.String())
+func GetCartItem(itemId uuid.UUID, ci *CartItem) error {
+	var resp CartItemResp
+
+	err := db.DB.Get(&resp, `select * from "CartItem" where "Id" = $1 or "ProductId" = $1`, itemId)
 	if err != nil {
 		return err
 	}
+
+	ci.Id = resp.Id
+	ci.ProductId = resp.ProductId
+	ci.Total = resp.Total
+	ci.Quantity = int64(resp.Quantity)
 
 	return nil
 }

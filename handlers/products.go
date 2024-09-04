@@ -13,13 +13,7 @@ func handleGetProducts(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	// cart := models.GetSessionValues(r)
-	// cart.Values["cart"] = models.Cart{}
-	// saveErr := cart.Save(r, w)
-	// if saveErr != nil {
-	// 	log.Fatal(saveErr)
-	// }
-	// fmt.Print(cart.Values["cart"])
+
 	Render(w, r, home.CatalogSlides(ps))
 
 	return nil

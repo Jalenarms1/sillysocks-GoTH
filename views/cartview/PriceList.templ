@@ -3,25 +3,48 @@ package cartview
 import (
 	"fmt"
 	"github.com/Jalenarms1/sillysocks-GoTH/models"
+	"github.com/Jalenarms1/sillysocks-GoTH/views/icons"
 )
 
 templ PriceList(cart models.Cart) {
-	<div class="flex flex-col w-full gap-3">
-		<div class="flex items-center justify-between">
-			<span class="font-semibold">Subtotal:</span>
-			<span>{ fmt.Sprintf("$ %.2f", cart.GetSubTotal()) }</span>
+	if len(cart) > 0 {
+
+		<div class="flex items-end justify-between gap-5">
+			<div  class="flex w-1/2 items-center mt-3">
+				<div class="flex flex-col w-full gap-3">
+					<div class="flex items-center justify-between">
+						<span class="font-semibold">Subtotal:</span>
+						<span>{ fmt.Sprintf("$ %.2f", cart.GetSubTotal()) }</span>
+					</div>
+					<div class="flex items-center justify-between">
+						<span class="font-semibold">Tax:</span>
+						<span>{ fmt.Sprintf("$ %.2f", cart.GetTax()) }</span>
+					</div>
+					<div class="flex items-center justify-between">
+						<span class="font-semibold">Shipping:</span>
+						<span>{ fmt.Sprintf("$ %.2f", cart.GetShippingCost()) }</span>
+					</div>
+					<div class="flex items-center justify-between">
+						<span class="font-semibold">Total:</span>
+						<span class="font-semibold">{ fmt.Sprintf("$ %.2f", cart.GetTotal()) }</span>
+					</div>
+				</div>
+			</div>
+			<div class="flex items-center w-1/2">
+				<input type="hidden" id="cart-json-store" name="cart-json" value={cart.ToJson()} />
+				<button 
+					hx-post="/api/stripe/checkout"
+					hx-include="#cart-json-store" 
+					class="btn btn-warning flex items-center w-full"
+				>
+					<div class="w-6 h-6">
+						@icons.ShoppingBag()
+					</div>
+					<span class="text-base">Checkout</span>
+				</button>
+			</div>
 		</div>
-		<div class="flex items-center justify-between">
-			<span class="font-semibold">Tax:</span>
-			<span>{ fmt.Sprintf("$ %.2f", cart.GetTax()) }</span>
-		</div>
-		<div class="flex items-center justify-between">
-			<span class="font-semibold">Shipping:</span>
-			<span>{ fmt.Sprintf("$ %.2f", cart.GetShippingCost()) }</span>
-		</div>
-		<div class="flex items-center justify-between">
-			<span class="font-semibold">Total:</span>
-			<span class="font-semibold">{ fmt.Sprintf("$ %.2f", cart.GetTotal()) }</span>
-		</div>
-	</div>
+	}
+	
+
 }

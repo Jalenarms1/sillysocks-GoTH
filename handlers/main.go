@@ -14,4 +14,5 @@ func HandleRoot(w http.ResponseWriter, r *http.Request) error {
 func RegisterRouter(router *chi.Mux) {
 	RegisterProductRouter(router)
 	RegisterCartRouter(router)
+	RegisterStripeRouter(router)
 }
