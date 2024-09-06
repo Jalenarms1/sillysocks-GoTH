@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/gob"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,14 +10,13 @@ import (
 
 	"github.com/Jalenarms1/sillysocks-GoTH/db"
 	"github.com/Jalenarms1/sillysocks-GoTH/handlers"
-	"github.com/Jalenarms1/sillysocks-GoTH/models"
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
 )
 
 func main() {
-	gob.Register(&models.Cart{})
-	gob.Register(&models.CartItem{})
+	// gob.Register(&models.Cart{})
+	// gob.Register(&models.CartItem{})
 	if err := godotenv.Load(); err != nil {
 		log.Fatal(err)
 	}

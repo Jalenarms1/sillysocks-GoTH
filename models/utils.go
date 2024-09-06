@@ -2,34 +2,25 @@ package models
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
+	"math/rand"
 	"reflect"
 
 	"github.com/gofrs/uuid"
 )
 
-func generateUUIDv4() (uuid.UUID, error) {
-	// var uuid [16]byte
-	// _, err := rand.Read(uuid[:])
-	// if err != nil {
-	// 	return uuid.Nil, err
-	// }
+func generateUUIDv4() uuid.UUID {
+	newId, err := uuid.NewV4()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return newId
+}
 
-	// // Set version (4 bits) to 0100
-	// uuid[6] = (uuid[6] & 0x0f) | 0x40
-	// // Set variant (2 bits) to 10
-	// uuid[8] = (uuid[8] & 0x3f) | 0x80
+func generateOrderNbr() string {
 
-	// // Format UUID as a string
-	// return fmt.Sprintf("%08x-%04x-%04x-%04x-%012x",
-	// 		uuid[0:4],
-	// 		uuid[4:6],
-	// 		uuid[6:8],
-	// 		uuid[8:10],
-	// 		uuid[10:]),
-	// 	nil
-
-	return uuid.NewV4()
+	return fmt.Sprintf("%d-%d", rand.Int31(), rand.Int31())
 }
 
 func DataGateway[T any](f func() ([]T, error)) []T {

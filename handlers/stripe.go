@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
+	"sync"
 
 	"github.com/Jalenarms1/sillysocks-GoTH/models"
 	"github.com/go-chi/chi/v5"
@@ -119,11 +121,53 @@ func handleStripeWebhook(w http.ResponseWriter, r *http.Request) error {
 	shpAddrCity := shpDt["city"].(string)
 	shpAddrState := shpDt["state"].(string)
 	shpAddrZip := shpDt["postal_code"].(string)
-	// pmtIntId := event.Data.Object["payment_intent"]
+	pmtIntId := event.Data.Object["payment_intent"].(string)
 
-	order := models.NewOrder(cstId, "", cstEmail, cstName, shpAddr1, shpAddr2.(string), shpAddrCity, shpAddrState, shpAddrZip, cart.GetSubTotal(), cart.GetTax(), cart.GetShippingCost())
-	fmt.Printf("%v\n", event.Data.Object["payment_intent"])
-	fmt.Printf("%v", order)
+	order := models.NewOrder(cstId, pmtIntId, cstEmail, cstName, shpAddr1, shpAddr2.(string), shpAddrCity, shpAddrState, shpAddrZip, cart.GetSubTotal(), cart.GetTax(), cart.GetShippingCost())
+
+	orderItems := models.NewOrderItems(cart, order.Id)
+
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+
+		err := order.Insert()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+	}()
+
+	wg.Wait()
+
+	go func() {
+		order.OrderItems = orderItems
+
+		if err := order.InsertItems(); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	go func() {
+		if err := cart.Clear(); err != nil {
+			fmt.Println(err)
+		}
+
+	}()
+
+	go func() {
+
+		to := []string{order.CustomerEmail}
+
+		email := models.NewEmail(to, "Order complete!", fmt.Sprintf("Thank you for your order!\n\nWe appreciate your purchase and are excited to get your items to you. You can expect to receive your order within 3-5 business days. Please note that this estimate is subject to change due to external factors such as shipping carrier delays or unforeseen circumstances.\n\nCheck your order status here: http://localhost:3000/orders/%s\n\nIf you have any questions or need assistance, our support team is here to help. Feel free to reach out to us at: sillysocksandmore@sillysocksandmore.com\n\nThank you for choosing us!\n\nBest regards,\n\nThe Silly Socks and More Team", order.OrderNbr))
+
+		err := email.SendMail()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 
 	return nil
 }

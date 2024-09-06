@@ -3,7 +3,6 @@ package models
 import (
 	"database/sql"
 	"encoding/json"
-	"log"
 
 	"github.com/Jalenarms1/sillysocks-GoTH/db"
 	"github.com/gofrs/uuid"
@@ -28,10 +27,8 @@ func (product *Product) ToJson() string {
 
 func NewProduct(product Product) *Product {
 	if product.Id == uuid.Nil {
-		newId, err := generateUUIDv4()
-		if err != nil {
-			log.Fatal(err)
-		}
+		newId := generateUUIDv4()
+
 		product.Id = newId
 	}
 

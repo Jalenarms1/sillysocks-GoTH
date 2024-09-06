@@ -59,6 +59,15 @@ func (ci *CartItem) insert() error {
 	return nil
 }
 
+func (c *Cart) Clear() error {
+	c = &Cart{}
+	if err := c.Save(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (c *Cart) Save() error {
 	itemMaps := make([]map[string]interface{}, len(*c))
 	for i, item := range *c {

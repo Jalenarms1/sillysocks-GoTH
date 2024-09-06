@@ -18,7 +18,7 @@ create table "Cart" (
 	"Tax" numeric(10,2) not null
 )
 
-CREATE TABLE IF NOT EXISTS public."Product"
+CREATE TABLE IF NOT EXISTS "Product"
 (
     "Id" uuid NOT NULL DEFAULT gen_random_uuid(),
     "Name" character varying(250) COLLATE pg_catalog."default" NOT NULL,
@@ -29,3 +29,30 @@ CREATE TABLE IF NOT EXISTS public."Product"
     "Quantity" integer NOT NULL,
     CONSTRAINT "Product_pkey" PRIMARY KEY ("Id")
 )
+
+CREATE TABLE IF NOT EXISTS "Order" (
+    "Id" UUID PRIMARY KEY,
+    "CstId" VARCHAR(255) NOT NULL,
+    "PmtIntId" VARCHAR(255) NOT NULL,
+    "CustomerEmail" VARCHAR(255) NOT NULL,
+    "CustomerName" VARCHAR(255) NOT NULL,
+    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "SubTotal" NUMERIC(10, 2) NOT NULL,
+    "Tax" NUMERIC(10, 2) NOT NULL,
+    "Shipping" NUMERIC(10, 2) NOT NULL,
+    "ShippingAddrLine1" VARCHAR(255) NOT NULL,
+    "ShippingAddrLine2" VARCHAR(255),
+    "ShippingAddrCity" VARCHAR(100) NOT NULL,
+    "ShippingAddrState" VARCHAR(100) NOT NULL,
+    "ShippingAddrZip" VARCHAR(20) NOT NULL,
+    "Shipped" BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+drop table "OrderItem";
+CREATE TABLE "OrderItem" (
+    "Id" UUID PRIMARY KEY,
+    "OrderId" UUID NOT NULL REFERENCES "Order" ("Id") ON DELETE CASCADE,
+    "Total" NUMERIC(10, 2) NOT NULL,
+    "Quantity" INT NOT NULL,
+	"ProductId" UUID NOT NULL
+);

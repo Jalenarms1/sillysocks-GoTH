@@ -1,19 +1,22 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
+	"github.com/Jalenarms1/sillysocks-GoTH/db"
 	"github.com/gofrs/uuid"
 )
 
 type Order struct {
 	Id                uuid.UUID    `json:"id" db:"Id"`
+	OrderNbr          string       `json:"orderNbr" db:"OrderNbr"`
 	CstId             string       `json:"cstId" db:"CstId"`
 	PmtIntId          string       `json:"pmtIntId" db:"PmtIntId"`
 	CustomerEmail     string       `json:"customerEmail" db:"CustomerEmail"`
 	CustomerName      string       `json:"customerName" db:"CustomerName"`
 	CreatedAt         time.Time    `json:"createdAt" db:"CreatedAt"`
-	SubTotal          float64      `json:"total" db:"Total"`
+	SubTotal          float64      `json:"total" db:"SubTotal"`
 	Tax               float64      `json:"tax" db:"Tax"`
 	Shipping          float64      `json:"shipping" db:"Shipping"`
 	ShippingAddrLine1 string       `json:"shippingAddrLine1" db:"ShippingAddrLine1"`
@@ -27,15 +30,18 @@ type Order struct {
 
 type OrderItem struct {
 	Id        uuid.UUID `json:"id" db:"Id"`
-	OrderId   string    `json:"orderId" db:"OrderId"`
-	ProductId string    `json:"productId" db:"ProductId"`
+	OrderId   uuid.UUID `json:"orderId" db:"OrderId"`
+	Total     float64   `json:"total" db:"Total"`
+	Quantity  int64     `json:"quantity" db:"Quantity"`
+	ProductId uuid.UUID `json:"productId" db:"ProductId"`
 }
 
 func NewOrder(cstId, pmtId, cstEmail, cstName, shpAddr1, shpAddr2, shpAddrCity, shpAddrState, shpAddrZip string, subTotal, tax, shipping float64) *Order {
-	newId, _ := generateUUIDv4()
-
+	newId := generateUUIDv4()
+	orderNbr := generateOrderNbr()
 	return &Order{
 		Id:                newId,
+		OrderNbr:          orderNbr,
 		CstId:             cstId,
 		PmtIntId:          pmtId,
 		CustomerEmail:     cstEmail,
@@ -50,6 +56,112 @@ func NewOrder(cstId, pmtId, cstEmail, cstName, shpAddr1, shpAddr2, shpAddrCity, 
 		ShippingAddrZip:   shpAddrZip,
 		CreatedAt:         time.Now(),
 	}
+}
+
+func NewOrderItems(cart Cart, orderId uuid.UUID) *[]OrderItem {
+	var orderItems []OrderItem
+
+	for _, ci := range cart {
+		newId := generateUUIDv4()
+		oi := &OrderItem{
+			Id:        newId,
+			OrderId:   orderId,
+			Total:     ci.Total,
+			Quantity:  ci.Quantity,
+			ProductId: ci.ProductId,
+		}
+
+		orderItems = append(orderItems, *oi)
+	}
+
+	return &orderItems
+}
+
+func (o *Order) Insert() error {
+	query := `
+		INSERT INTO "Order" (
+			"Id", 
+			"OrderNbr",
+			"CstId", 
+			"PmtIntId", 
+			"CustomerEmail", 
+			"CustomerName", 
+			"CreatedAt", 
+			"SubTotal", 
+			"Tax", 
+			"Shipping", 
+			"ShippingAddrLine1", 
+			"ShippingAddrLine2", 
+			"ShippingAddrCity", 
+			"ShippingAddrState", 
+			"ShippingAddrZip", 
+			"Shipped"
+		) VALUES (
+			:Id,
+			:OrderNbr, 
+			:CstId, 
+			:PmtIntId, 
+			:CustomerEmail, 
+			:CustomerName, 
+			:CreatedAt, 
+			:SubTotal, 
+			:Tax, 
+			:Shipping, 
+			:ShippingAddrLine1, 
+			:ShippingAddrLine2, 
+			:ShippingAddrCity, 
+			:ShippingAddrState, 
+			:ShippingAddrZip, 
+			:Shipped
+		)
+	`
+
+	_, err := db.DB.NamedExec(query, &o)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *Order) InsertItems() error {
+
+	itemsMap := make([]map[string]interface{}, len(*o.OrderItems))
+	for i, oi := range *o.OrderItems {
+		itemsMap[i] = map[string]interface{}{
+			"Id":        oi.Id,
+			"OrderId":   oi.OrderId,
+			"Total":     oi.Total,
+			"Quantity":  oi.Quantity,
+			"ProductId": oi.ProductId,
+		}
+
+	}
+
+	fmt.Println(itemsMap)
+
+	query := `
+		insert into "OrderItem" (
+			"Id",
+			"OrderId",
+			"Total",
+			"Quantity",
+			"ProductId"
+		) VALUES (
+			:Id,
+			:OrderId,
+			:Total,
+			:Quantity,
+			:ProductId
+		)
+	`
+
+	_, err := db.DB.NamedExec(query, itemsMap)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // func HandleOrderSubmit(order Order) {

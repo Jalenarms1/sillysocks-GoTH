@@ -2,3 +2,5 @@
 
 node_modules/
 .vscode
+docker-compose.yml
+Dockerfile

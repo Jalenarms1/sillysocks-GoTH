@@ -9,8 +9,10 @@ require (
 	github.com/go-chi/chi/v5 v5.1.0
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/jmoiron/sqlx v1.4.0
-	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9
 )
 
-require github.com/stripe/stripe-go/v79 v79.9.0 // indirect
+require (
+	github.com/joho/godotenv v1.5.1
+	github.com/stripe/stripe-go/v79 v79.9.0
+)
