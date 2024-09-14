@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,21 +12,58 @@ import (
 	"github.com/Jalenarms1/sillysocks-GoTH/db"
 	"github.com/Jalenarms1/sillysocks-GoTH/handlers"
 	"github.com/go-chi/chi/v5"
+	"github.com/gofrs/uuid"
 	"github.com/joho/godotenv"
 )
 
+func userMiddleware(next http.Handler) http.Handler {
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		cookie, _ := r.Cookie("silly-socks-user")
+		var ctx context.Context
+		if cookie == nil {
+			localId, _ := uuid.NewV4()
+
+			http.SetCookie(w, &http.Cookie{
+				Name:  "silly-socks-user",
+				Value: localId.String(),
+				Path:  "/",
+			})
+
+			ctx = context.WithValue(r.Context(), handlers.UserCtxKey, localId.String())
+
+		} else {
+			ctx = context.WithValue(r.Context(), handlers.UserCtxKey, cookie.Value)
+
+		}
+
+		w.WriteHeader(http.StatusOK)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
 func main() {
-	// gob.Register(&models.Cart{})
-	// gob.Register(&models.CartItem{})
+
 	if err := godotenv.Load(); err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println("Hello World")
 
-	db.InitDB(os.Getenv("DB_CONN_STR"))
+	db.InitDB(os.Getenv("MASTER_DB_URL"))
 	defer db.CloseDB()
 
 	router := chi.NewMux()
+
+	router.Use(userMiddleware)
 
 	workDir, _ := os.Getwd()
 	filesDir := http.Dir(filepath.Join(workDir, "public"))

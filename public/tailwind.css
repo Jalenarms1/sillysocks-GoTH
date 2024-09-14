@@ -2726,6 +2726,16 @@ html {
   background-color: var(--fallback-b1,oklch(var(--b1)/var(--tw-bg-opacity)));
 }
 
+.bg-blue-400 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(96 165 250 / var(--tw-bg-opacity));
+}
+
+.bg-blue-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(59 130 246 / var(--tw-bg-opacity));
+}
+
 .bg-green-400 {
   --tw-bg-opacity: 1;
   background-color: rgb(74 222 128 / var(--tw-bg-opacity));
@@ -2918,11 +2928,6 @@ html {
 
 .shadow-zinc-300 {
   --tw-shadow-color: #d4d4d8;
-  --tw-shadow: var(--tw-shadow-colored);
-}
-
-.shadow-zinc-400 {
-  --tw-shadow-color: #a1a1aa;
   --tw-shadow: var(--tw-shadow-colored);
 }
 

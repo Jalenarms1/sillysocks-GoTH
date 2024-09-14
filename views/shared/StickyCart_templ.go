@@ -26,7 +26,7 @@ func StickyCart() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a href=\"/cart\" class=\"navbar bg-white sticky bottom-0 w-full border-t border-zinc-400 shadow-sm shadow-zinc-200 text-black\"><div class=\"flex flex-1 items-center gap-2\"><p class=\"font-semibold text-lg\">Total:</p><p id=\"cart-total\" class=\"text-lg \"></p></div><div class=\"flex-none\"><div id=\"sticky-cart-icon\" class=\"dropdown dropdown-end\"></div></div></a> <input type=\"hidden\" hx-get=\"/api/cart/count\" hx-target=\"#sticky-cart-icon\" hx-swap=\"innerHTML\" hx-trigger=\"load, loadCartCount from:body\"> <input type=\"hidden\" hx-get=\"/api/cart/total\" hx-target=\"#cart-total\" hx-swap=\"innerHTML\" hx-trigger=\"load, loadCartCount from:body\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a href=\"/cart\" class=\"navbar bg-blue-400  sticky bottom-0 w-full border-t border-zinc-400 shadow-sm shadow-zinc-200 text-white\"><div class=\"flex flex-1 items-center gap-2\"><p class=\"font-semibold text-lg \">Total:</p><p id=\"cart-total\" class=\"text-lg \"></p></div><div class=\"flex-none\"><div id=\"sticky-cart-icon\" class=\"dropdown dropdown-end \"></div></div></a> <input type=\"hidden\" hx-get=\"/api/cart/count\" hx-target=\"#sticky-cart-icon\" hx-swap=\"innerHTML\" hx-trigger=\"load, loadCartCount from:body\"> <input type=\"hidden\" hx-get=\"/api/cart/total\" hx-target=\"#cart-total\" hx-swap=\"innerHTML\" hx-trigger=\"load, loadCartCount from:body\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

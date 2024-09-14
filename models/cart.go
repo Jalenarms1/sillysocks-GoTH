@@ -7,8 +7,8 @@ import (
 	"math"
 	"net/http"
 
-	"github.com/Jalenarms1/sillysocks-GoTH/db"
 	"github.com/gofrs/uuid"
+	"github.com/jmoiron/sqlx"
 )
 
 type CartItem struct {
@@ -46,12 +46,12 @@ func (c *Cart) ToJson() string {
 	return string(bytes)
 }
 
-func (ci *CartItem) insert() error {
+func (ci *CartItem) insert(userDb *sqlx.DB) error {
 	query := `
-		insert into "CartItem" ("Id", "ProductId", "Total", "Quantity") values (:Id, :ProductId, :Total, :Quantity)
+		insert into CartItem ("Id", "ProductId", "Total", "Quantity") values (:Id, :ProductId, :Total, :Quantity)
 	`
 
-	_, err := db.DB.NamedExec(query, ci)
+	_, err := userDb.NamedExec(query, ci)
 	if err != nil {
 		return err
 	}
@@ -59,39 +59,54 @@ func (ci *CartItem) insert() error {
 	return nil
 }
 
-func (c *Cart) Clear() error {
+func (c *Cart) Clear(userDb *sqlx.DB) error {
 	c = &Cart{}
-	if err := c.Save(); err != nil {
+	if err := c.Save(userDb); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (c *Cart) Save() error {
+func (c *Cart) Save(userDb *sqlx.DB) error {
 	itemMaps := make([]map[string]interface{}, len(*c))
 	for i, item := range *c {
+		var id string
+		if item.Id == uuid.Nil {
+			newId, _ := uuid.NewV4()
+			id = newId.String()
+		} else {
+			id = item.Id.String()
+		}
+
+		var productId string
+		if item.ProductId == uuid.Nil {
+			productId = item.Product.Id.String()
+		} else {
+			productId = item.ProductId.String()
+		}
+
 		itemMaps[i] = map[string]interface{}{
-			"Id":        item.Id,
-			"ProductId": item.ProductId,
+			"Id":        id,
+			"ProductId": productId,
 			"Total":     item.Total,
 			"Quantity":  item.Quantity,
 		}
 	}
 
-	tx, err := db.DB.Beginx()
+	tx, err := userDb.Beginx()
 	if err != nil {
 		return err
 	}
 	defer tx.Rollback()
 
-	_, delErr := tx.Exec(`delete from "CartItem";`)
+	_, delErr := tx.Exec(`delete from CartItem;`)
 	if delErr != nil {
 		return delErr
 	}
 
 	query := `
-        insert into "CartItem" ("Id", "ProductId", "Total", "Quantity")
+        insert into CartItem (Id, ProductId, Total, Quantity)
         values (:Id, :ProductId, :Total, :Quantity);
     `
 	if len(itemMaps) > 0 {
@@ -110,16 +125,16 @@ func (c *Cart) Save() error {
 	return nil
 }
 
-func (ci *CartItem) save() error {
+func (ci *CartItem) save(userDb *sqlx.DB) error {
 	query := `
-		update "CartItem"
+		update CartItem
 		set
 			"Total" = :Total,
 			"Quantity" = :Quantity
 		where "Id" = :Id
 	`
 
-	_, err := db.DB.NamedExec(query, ci)
+	_, err := userDb.NamedExec(query, ci)
 	if err != nil {
 		return err
 	}
@@ -127,10 +142,10 @@ func (ci *CartItem) save() error {
 	return nil
 }
 
-func (cart *Cart) NumOfItems() int {
+func (cart *Cart) NumOfItems(userDb *sqlx.DB) int {
 	var count int
 
-	err := db.DB.QueryRow(`select sum("Quantity") from "CartItem"`).Scan(&count)
+	err := userDb.QueryRow(`select sum("Quantity") from CartItem`).Scan(&count)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -177,14 +192,14 @@ func (cart *Cart) GetShippingCost() float64 {
 	return 5
 }
 
-func AddToCart(product *Product) error {
+func AddToCart(product *Product, userDb *sqlx.DB) error {
 	// fmt.Println("Add to cart")
 	// fmt.Print(cart)
-	// stmt, err := db.DB.Prepare(`
-	// 	insert into "CartItem" ("")
+	// stmt, err := userDb.Prepare(`
+	// 	insert into CartItem ("")
 	// `)
 	var cartItem CartItem
-	if err := GetCartItem(product.Id, &cartItem); err != nil {
+	if err := GetCartItem(product.Id, &cartItem, userDb); err != nil {
 		cartItem = CartItem{}
 	}
 
@@ -198,7 +213,7 @@ func AddToCart(product *Product) error {
 			Quantity:  1,
 		}
 
-		err := cartItem.insert()
+		err := cartItem.insert(userDb)
 		if err != nil {
 			return err
 		}
@@ -206,7 +221,7 @@ func AddToCart(product *Product) error {
 		cartItem.Quantity += 1
 		cartItem.Total = cartItem.Product.Price * float64(cartItem.Quantity)
 
-		err := cartItem.save()
+		err := cartItem.save(userDb)
 		if err != nil {
 			return err
 		}
@@ -215,29 +230,30 @@ func AddToCart(product *Product) error {
 	return nil
 }
 
-func GetCart(w http.ResponseWriter, r *http.Request) Cart {
+func GetCart(w http.ResponseWriter, r *http.Request, userDb *sqlx.DB) Cart {
 
 	query := `
 	    SELECT
-	        ci."Id",
-	        ci."ProductId",
-			ci."Total",
-	        ci."Quantity",
-	        p."Name",
-	        p."Description",
-	        p."Category",
-	        p."Image",
-	        p."Price",
-	        p."Quantity" as "ProductQuantity"
+	        ci.Id,
+	        ci.ProductId,
+			ci.Total,
+	        ci.Quantity,
+	        p.Name,
+	        p.Description,
+	        p.Category,
+	        p.Image,
+	        p.Price,
+	        p.Quantity as ProductQuantity
 	    FROM
-	        "CartItem" ci
+	        CartItem ci
 	    JOIN
-	        "Product" p ON ci."ProductId" = p."Id";
+	        Product p ON ci.ProductId = p.Id;
 	`
 
 	var recordsList []CartRecord
 
-	err := db.DB.Select(&recordsList, query)
+	err := userDb.Select(&recordsList, query)
+	// err := userDb.Select(&recordsList, query)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -275,10 +291,10 @@ type CartItemResp struct {
 	Quantity  int32     `db:"Quantity"`
 }
 
-func GetCartItem(itemId uuid.UUID, ci *CartItem) error {
+func GetCartItem(itemId uuid.UUID, ci *CartItem, userDb *sqlx.DB) error {
 	var resp CartItemResp
 
-	err := db.DB.Get(&resp, `select * from "CartItem" where "Id" = $1 or "ProductId" = $1`, itemId)
+	err := userDb.Get(&resp, `select * from CartItem where Id = ? or ProductId = ?`, itemId)
 	if err != nil {
 		return err
 	}

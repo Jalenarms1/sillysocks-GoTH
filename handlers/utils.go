@@ -7,6 +7,12 @@ import (
 	"github.com/a-h/templ"
 )
 
+type UserContextKey string
+
+const (
+	UserCtxKey UserContextKey = "user-uid-silly-socks"
+)
+
 type HTTPHandler func(w http.ResponseWriter, r *http.Request) error
 
 func UseHTTPHandler(h HTTPHandler) http.HandlerFunc {

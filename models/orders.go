@@ -1,11 +1,10 @@
 package models
 
 import (
-	"fmt"
 	"time"
 
-	"github.com/Jalenarms1/sillysocks-GoTH/db"
 	"github.com/gofrs/uuid"
+	"github.com/jmoiron/sqlx"
 )
 
 type Order struct {
@@ -15,7 +14,7 @@ type Order struct {
 	PmtIntId          string       `json:"pmtIntId" db:"PmtIntId"`
 	CustomerEmail     string       `json:"customerEmail" db:"CustomerEmail"`
 	CustomerName      string       `json:"customerName" db:"CustomerName"`
-	CreatedAt         time.Time    `json:"createdAt" db:"CreatedAt"`
+	CreatedAt         int64        `json:"createdAt" db:"CreatedAt"`
 	SubTotal          float64      `json:"total" db:"SubTotal"`
 	Tax               float64      `json:"tax" db:"Tax"`
 	Shipping          float64      `json:"shipping" db:"Shipping"`
@@ -54,7 +53,7 @@ func NewOrder(cstId, pmtId, cstEmail, cstName, shpAddr1, shpAddr2, shpAddrCity, 
 		ShippingAddrCity:  shpAddrCity,
 		ShippingAddrState: shpAddrState,
 		ShippingAddrZip:   shpAddrZip,
-		CreatedAt:         time.Now(),
+		CreatedAt:         time.Now().Unix(),
 	}
 }
 
@@ -77,7 +76,7 @@ func NewOrderItems(cart Cart, orderId uuid.UUID) *[]OrderItem {
 	return &orderItems
 }
 
-func (o *Order) Insert() error {
+func (o *Order) Insert(userDb *sqlx.DB) error {
 	query := `
 		INSERT INTO "Order" (
 			"Id", 
@@ -116,7 +115,7 @@ func (o *Order) Insert() error {
 		)
 	`
 
-	_, err := db.DB.NamedExec(query, &o)
+	_, err := userDb.NamedExec(query, &o)
 	if err != nil {
 		return err
 	}
@@ -124,7 +123,7 @@ func (o *Order) Insert() error {
 	return nil
 }
 
-func (o *Order) InsertItems() error {
+func (o *Order) InsertItems(userDb *sqlx.DB) error {
 
 	itemsMap := make([]map[string]interface{}, len(*o.OrderItems))
 	for i, oi := range *o.OrderItems {
@@ -137,8 +136,6 @@ func (o *Order) InsertItems() error {
 		}
 
 	}
-
-	fmt.Println(itemsMap)
 
 	query := `
 		insert into "OrderItem" (
@@ -156,7 +153,7 @@ func (o *Order) InsertItems() error {
 		)
 	`
 
-	_, err := db.DB.NamedExec(query, itemsMap)
+	_, err := userDb.NamedExec(query, itemsMap)
 	if err != nil {
 		return err
 	}
@@ -167,5 +164,5 @@ func (o *Order) InsertItems() error {
 // func HandleOrderSubmit(order Order) {
 // 	query := `insert into Order ("Id", "CustomerEmail", "SubTotal", "Tax", "Shipped", "CreatedAt") values ($1,$2,$3,$4,$5, $6)`
 
-// 	res, err := db.DB.Exec(query, order.Id, order.CustomerEmail, order.SubTotal, order.Tax, order.Shipped, order.CreatedAt)
+// 	res, err := userDb.Exec(query, order.Id, order.CustomerEmail, order.SubTotal, order.Tax, order.Shipped, order.CreatedAt)
 // }

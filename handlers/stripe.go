@@ -9,8 +9,10 @@ import (
 	"os"
 	"sync"
 
+	"github.com/Jalenarms1/sillysocks-GoTH/db"
 	"github.com/Jalenarms1/sillysocks-GoTH/models"
 	"github.com/go-chi/chi/v5"
+	"github.com/gofrs/uuid"
 	"github.com/stripe/stripe-go/v79"
 	"github.com/stripe/stripe-go/v79/checkout/session"
 )
@@ -22,14 +24,25 @@ func RegisterStripeRouter(router *chi.Mux) {
 }
 
 func handleCreateCheckout(w http.ResponseWriter, r *http.Request) error {
-	domain := "http://localhost:3000"
-	r.ParseForm()
-	// var cart models.Cart
+	domain := os.Getenv("CLIENT_DOMAIN")
+	var cart models.Cart
 
-	// err := json.Unmarshal([]byte(r.FormValue("cart-json")), &cart)
-	cart := models.GetCart(w, r)
-	// fmt.Printf("\n%v\n", cart)
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		return err
+	}
 
+	jErr := json.Unmarshal(body, &cart)
+	if jErr != nil {
+		return jErr
+	}
+
+	userUid := r.Context().Value(UserCtxKey).(string)
+	userDb, uErr := db.GetDb(uuid.FromStringOrNil(userUid))
+	if uErr != nil {
+		return uErr
+	}
+	cart.Save(userDb)
 	var lineItems []*stripe.CheckoutSessionLineItemParams
 	var total int64
 	for _, i := range cart {
@@ -76,7 +89,6 @@ func handleCreateCheckout(w http.ResponseWriter, r *http.Request) error {
 		lineItems = append(lineItems, shippingItem)
 
 	}
-	// fmt.Printf("%v", lineItems)
 	params := &stripe.CheckoutSessionParams{
 		LineItems:  lineItems,
 		Mode:       stripe.String(string(stripe.CheckoutSessionModePayment)),
@@ -85,13 +97,25 @@ func handleCreateCheckout(w http.ResponseWriter, r *http.Request) error {
 		ShippingAddressCollection: &stripe.CheckoutSessionShippingAddressCollectionParams{
 			AllowedCountries: stripe.StringSlice([]string{"US"}),
 		},
+		Metadata: map[string]string{
+			"userUid": r.Context().Value(UserCtxKey).(string),
+		},
 	}
 	session, err := session.New(params)
 
 	if err != nil {
 		return err
 	}
-	w.Header().Set("HX-Redirect", session.URL)
+	resBody := map[string]string{
+		"checkoutUrl": session.URL,
+	}
+
+	rErr := json.NewEncoder(w).Encode(resBody)
+	if rErr != nil {
+		return rErr
+	}
+
+	// w.Header().Set("HX-Redirect", session.URL)
 	return nil
 }
 
@@ -105,7 +129,15 @@ func handleStripeWebhook(w http.ResponseWriter, r *http.Request) error {
 	if umErr := json.Unmarshal(body, &event); umErr != nil {
 		return umErr
 	}
-	cart := models.GetCart(w, r)
+	mtdt := event.Data.Object["metadata"].(map[string]interface{})
+
+	userUid := mtdt["userUid"].(string)
+
+	userDb, uErr := db.GetDb(uuid.FromStringOrNil(userUid))
+	if uErr != nil {
+		return uErr
+	}
+	cart := models.GetCart(w, r, userDb)
 	cstDt := event.Data.Object["customer_details"].(map[string]interface{})
 	shpDt := event.Data.Object["shipping_details"].(map[string]interface{})["address"].(map[string]interface{})
 
@@ -133,7 +165,7 @@ func handleStripeWebhook(w http.ResponseWriter, r *http.Request) error {
 	go func() {
 		defer wg.Done()
 
-		err := order.Insert()
+		err := order.Insert(userDb)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -145,13 +177,13 @@ func handleStripeWebhook(w http.ResponseWriter, r *http.Request) error {
 	go func() {
 		order.OrderItems = orderItems
 
-		if err := order.InsertItems(); err != nil {
+		if err := order.InsertItems(userDb); err != nil {
 			log.Fatal(err)
 		}
 	}()
 
 	go func() {
-		if err := cart.Clear(); err != nil {
+		if err := cart.Clear(userDb); err != nil {
 			fmt.Println(err)
 		}
 

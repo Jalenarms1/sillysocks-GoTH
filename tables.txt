@@ -31,28 +31,55 @@ CREATE TABLE IF NOT EXISTS "Product"
 )
 
 CREATE TABLE IF NOT EXISTS "Order" (
-    "Id" UUID PRIMARY KEY,
+    "Id" TEXT PRIMARY KEY,
     "CstId" VARCHAR(255) NOT NULL,
     "PmtIntId" VARCHAR(255) NOT NULL,
     "CustomerEmail" VARCHAR(255) NOT NULL,
     "CustomerName" VARCHAR(255) NOT NULL,
-    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "SubTotal" NUMERIC(10, 2) NOT NULL,
-    "Tax" NUMERIC(10, 2) NOT NULL,
-    "Shipping" NUMERIC(10, 2) NOT NULL,
+    "CreatedAt" INTEGER NOT NULL,
+    "SubTotal" REAL NOT NULL,
+    "Tax" REAL NOT NULL,
+    "Shipping" REAL NOT NULL,
     "ShippingAddrLine1" VARCHAR(255) NOT NULL,
     "ShippingAddrLine2" VARCHAR(255),
     "ShippingAddrCity" VARCHAR(100) NOT NULL,
     "ShippingAddrState" VARCHAR(100) NOT NULL,
     "ShippingAddrZip" VARCHAR(20) NOT NULL,
-    "Shipped" BOOLEAN NOT NULL DEFAULT FALSE
+    "Shipped" BOOLEAN NOT NULL DEFAULT 0
 );
 
-drop table "OrderItem";
-CREATE TABLE "OrderItem" (
-    "Id" UUID PRIMARY KEY,
-    "OrderId" UUID NOT NULL REFERENCES "Order" ("Id") ON DELETE CASCADE,
-    "Total" NUMERIC(10, 2) NOT NULL,
-    "Quantity" INT NOT NULL,
-	"ProductId" UUID NOT NULL
+
+drop table if exists OrderItem;
+CREATE TABLE IF NOT EXISTS OrderItem (
+    Id TEXT PRIMARY KEY,
+    OrderId TEXT NOT NULL,
+    Total REAL NOT NULL,
+    Quantity INTEGER NOT NULL,
+    ProductId TEXT NOT NULL,
+    FOREIGN KEY (OrderId) REFERENCES Order (Id),
+    FOREIGN KEY (ProductId) REFERENCES Product (Id)
 );
+
+drop table if exists DbStore;
+create table DbStore (
+    Id TEXT PRIMARY KEY NOT NULL,
+    Hostname TEXT NOT NULL,
+    AuthToken TEXT NOT NULL,
+    UserUid TEXT NOT NULL
+
+);
+insQ := `
+		INSERT INTO DbStore (
+			Id,
+			Hostname,
+			AuthToken,
+			UserUid
+		)
+		VALUES (
+			:Id,
+			:Hostname,
+			:AuthToken,
+			:UserUid
+		)
+
+	`
