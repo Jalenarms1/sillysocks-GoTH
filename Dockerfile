@@ -14,4 +14,4 @@ COPY --from=builder /app/bin .
 
 EXPOSE 3000
 
-CMD ["./"]
+CMD ["./sillysocks-GoTH"]
