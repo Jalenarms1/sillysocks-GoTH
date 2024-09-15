@@ -28,6 +28,7 @@ func userMiddleware(next http.Handler) http.Handler {
 		}
 
 		cookie, _ := r.Cookie("silly-socks-user")
+		fmt.Println(cookie)
 		var ctx context.Context
 		if cookie == nil {
 			localId, _ := uuid.NewV4()
