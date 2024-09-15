@@ -36,7 +36,7 @@ func handleCreateCheckout(w http.ResponseWriter, r *http.Request) error {
 	if jErr != nil {
 		return jErr
 	}
-
+	fmt.Println(cart)
 	userUid := r.Context().Value(UserCtxKey).(string)
 	userDb, uErr := db.GetDb(uuid.FromStringOrNil(userUid))
 	if uErr != nil {
