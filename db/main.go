@@ -149,7 +149,6 @@ func createDatabase(token uuid.UUID) (*sqlx.DB, error) {
 	var jd map[string]interface{}
 
 	err := json.Unmarshal(data, &jd)
-	fmt.Println(jd)
 	if err != nil || jd["error"] != nil {
 		return nil, errors.New("please verify the database does not exists already")
 	}
