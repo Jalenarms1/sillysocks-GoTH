@@ -34,9 +34,10 @@ func userMiddleware(next http.Handler) http.Handler {
 			localId, _ := uuid.NewV4()
 
 			http.SetCookie(w, &http.Cookie{
-				Name:  "silly-socks-user",
-				Value: localId.String(),
-				Path:  "/",
+				Name:   "silly-socks-user",
+				Value:  localId.String(),
+				Path:   "/",
+				MaxAge: 3600 * 3600,
 			})
 
 			ctx = context.WithValue(r.Context(), handlers.UserCtxKey, localId.String())
