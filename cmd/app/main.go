@@ -37,7 +37,8 @@ func userMiddleware(next http.Handler) http.Handler {
 				Name:   "silly-socks-user",
 				Value:  localId.String(),
 				Path:   "/",
-				MaxAge: 3600 * 3600,
+				MaxAge: 3600,
+				Secure: true,
 			})
 
 			ctx = context.WithValue(r.Context(), handlers.UserCtxKey, localId.String())
