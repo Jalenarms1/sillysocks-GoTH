@@ -34,9 +34,11 @@ func handleGetProductById(w http.ResponseWriter, r *http.Request) error {
 func handleGetProductList(w http.ResponseWriter, r *http.Request) error {
 	var products []models.Product
 
-	if err := db.DB.Select(&products, `SELECT * FROM Product`); err != nil {
-		return err
-	}
+	// if err := db.DB.Select(&products, `SELECT * FROM Product`); err != nil {
+	// 	return err
+	// }
+
+	url := "https://masterdb-jalenarms1.turso.io/v2/pipeline"
 
 	jErr := json.NewEncoder(w).Encode(products)
 	if jErr != nil {
