@@ -154,11 +154,12 @@ func createDatabase(token uuid.UUID) (*sqlx.DB, error) {
 	}
 	hostName := jd["database"].(map[string]interface{})["Hostname"]
 	dbName := jd["database"].(map[string]interface{})["Name"].(string)
-
+	fmt.Println("Getting token")
 	dbToken, tErr := getDatabaseToken(dbName)
 	if tErr != nil {
 		return nil, tErr
 	}
+	fmt.Println("Got token")
 	jt := tokenToJWT(dbToken)
 	newId, _ := uuid.NewV4()
 	newStore := &DbStore{
