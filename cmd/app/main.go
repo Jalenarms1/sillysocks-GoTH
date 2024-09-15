@@ -54,7 +54,6 @@ func main() {
 	// if err := godotenv.Load(); err != nil {
 	// 	log.Fatal(err)
 	// }
-	fmt.Println("Hello World")
 
 	db.InitDB(os.Getenv("MASTER_DB_URL"))
 	defer db.CloseDB()
