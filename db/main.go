@@ -2,9 +2,7 @@ package db
 
 import (
 	"bytes"
-	"context"
 	"database/sql"
-	"database/sql/driver"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -17,7 +15,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/jmoiron/sqlx"
-	"github.com/tursodatabase/libsql-client-go/libsql"
+	_ "github.com/tursodatabase/libsql-client-go/libsql"
 
 	_ "github.com/lib/pq"
 )
@@ -96,21 +94,6 @@ func GetDb(userId uuid.UUID) (*sqlx.DB, error) {
 		return db, nil
 	}
 
-}
-
-func GetDbCnxn(connString string) driver.Conn {
-
-	cnctr, cErr := libsql.NewConnector(connString, libsql.WithTls(false))
-	if cErr != nil {
-		log.Fatal(cErr)
-	}
-	var ctx context.Context
-	cnxn, cnxnErr := cnctr.Connect(ctx)
-	if cnxnErr != nil {
-		log.Fatal(cnxnErr)
-	}
-
-	return cnxn
 }
 
 func InitDB(connString string) {
