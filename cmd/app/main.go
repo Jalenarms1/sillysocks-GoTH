@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/Jalenarms1/sillysocks-GoTH/db"
 	"github.com/Jalenarms1/sillysocks-GoTH/handlers"
 	"github.com/go-chi/chi/v5"
 	"github.com/gofrs/uuid"
@@ -54,8 +55,8 @@ func main() {
 	// 	log.Fatal(err)
 	// }
 
-	// db.InitDB(os.Getenv("MASTER_DB_URL"))
-	// defer db.CloseDB()
+	db.InitDB(os.Getenv("MASTER_DB_URL"))
+	defer db.CloseDB()
 
 	router := chi.NewMux()
 
