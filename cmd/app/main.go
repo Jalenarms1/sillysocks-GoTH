@@ -45,7 +45,6 @@ func userMiddleware(next http.Handler) http.Handler {
 
 		}
 
-		w.WriteHeader(http.StatusOK)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
