@@ -99,6 +99,7 @@ func GetDb(userId uuid.UUID) (*sqlx.DB, error) {
 }
 
 func GetDbCnxn(connString string) driver.Conn {
+
 	cnctr, cErr := libsql.NewConnector(connString, libsql.WithTls(false))
 	if cErr != nil {
 		log.Fatal(cErr)
