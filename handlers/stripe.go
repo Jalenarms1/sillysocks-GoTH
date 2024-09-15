@@ -42,7 +42,10 @@ func handleCreateCheckout(w http.ResponseWriter, r *http.Request) error {
 	if uErr != nil {
 		return uErr
 	}
-	cart.Save(userDb)
+	if sErr := cart.Save(userDb); sErr != nil {
+		return sErr
+	}
+	fmt.Println("saved")
 	var lineItems []*stripe.CheckoutSessionLineItemParams
 	var total int64
 	for _, i := range cart {

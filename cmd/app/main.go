@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -72,7 +73,7 @@ func main() {
 
 	router.Get("/", handlers.UseHTTPHandler(handlers.HandleRoot))
 	fmt.Printf("http://localhost%s\n", listenAddr)
-	http.ListenAndServe(listenAddr, router)
+	log.Fatal(http.ListenAndServe(listenAddr, router))
 }
 
 func FileServer(r chi.Router, path string, root http.FileSystem) {

@@ -1,15 +1,10 @@
-drop table if exists "CartItem"
-create table "CartItem" (
-	"Id" uuid primary key,
-	"ProductId" uuid not null,
-    "ProductName" varchar(250) not null,
-    "ProductImage" varchar(250) not null,
-    "ProductPrice" numeric(10,2) not null,
-	"CartId" uuid not null,
-	"Total" numeric(10,2) not null,
-	"Quantity" int not null,
-	foreign key ("ProductId") references "Product"("Id"),
-	foreign key ("CartId") references "Cart"("Id")
+drop table if exists CartItem
+create table CartItem (
+	Id uuid primary key,
+	ProductId uuid not null,
+	Total numeric(10,2) not null,
+	Quantity int not null,
+	foreign key (ProductId) references Product(Id),
 )
 
 create table "Cart" (
