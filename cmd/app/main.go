@@ -39,6 +39,7 @@ func userMiddleware(next http.Handler) http.Handler {
 				Path:   "/",
 				MaxAge: 3600,
 				Secure: true,
+				Domain: "sillysocks-goth-production.up.railway.app",
 			})
 
 			ctx = context.WithValue(r.Context(), handlers.UserCtxKey, localId.String())
