@@ -171,7 +171,7 @@ func createDatabase(token uuid.UUID) (*sqlx.DB, error) {
 
 	go newStore.insertRecord()
 
-	newDbUrl := "libsql://" + hostName.(string) + "-jalenarms1" + "?authToken=" + dbToken
+	newDbUrl := "libsql://" + hostName.(string) + "?authToken=" + dbToken
 
 	nDb, nErr := sqlx.Connect("libsql", newDbUrl)
 	if nErr != nil {
