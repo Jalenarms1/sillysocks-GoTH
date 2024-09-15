@@ -27,10 +27,10 @@ func userMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		cookie, _ := r.Cookie("silly-socks-user")
+		cookie, err := r.Cookie("silly-socks-user")
 		fmt.Println(cookie)
 		var ctx context.Context
-		if cookie == nil {
+		if err != nil {
 			localId, _ := uuid.NewV4()
 
 			http.SetCookie(w, &http.Cookie{
