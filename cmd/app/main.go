@@ -26,7 +26,7 @@ func userMiddleware(next http.Handler) http.Handler {
 			w.WriteHeader(http.StatusOK)
 			return
 		}
-
+		fmt.Println(r.Cookies())
 		cookie, err := r.Cookie("silly-socks-user")
 		fmt.Println(err)
 		var ctx context.Context
