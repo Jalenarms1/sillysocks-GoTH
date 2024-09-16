@@ -31,6 +31,7 @@ func userMiddleware(next http.Handler) http.Handler {
 		authToken := r.Header.Get("Authorization")
 		var ctx context.Context
 		if authToken == "" {
+			fmt.Println("Token empty")
 			localId, _ := uuid.NewV4()
 
 			http.SetCookie(w, &http.Cookie{
