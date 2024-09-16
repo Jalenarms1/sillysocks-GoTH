@@ -35,11 +35,11 @@ func userMiddleware(next http.Handler) http.Handler {
 			localId, _ := uuid.NewV4()
 
 			http.SetCookie(w, &http.Cookie{
-				Name:   "silly-socks-user",
-				Value:  localId.String(),
-				Path:   "/",
-				Secure: true,
-				Domain: "sillysocksandmore.com",
+				Name:     "silly-socks-user",
+				Value:    localId.String(),
+				Path:     "/",
+				Secure:   true,
+				SameSite: http.SameSiteNoneMode,
 			})
 
 			ctx = context.WithValue(r.Context(), handlers.UserCtxKey, localId.String())
