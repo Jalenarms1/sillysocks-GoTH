@@ -39,6 +39,7 @@ func userMiddleware(next http.Handler) http.Handler {
 				Value:  localId.String(),
 				Path:   "/",
 				Secure: true,
+				Domain: "sillysocksandmore.com",
 			})
 
 			ctx = context.WithValue(r.Context(), handlers.UserCtxKey, localId.String())
