@@ -26,6 +26,7 @@ func userMiddleware(next http.Handler) http.Handler {
 			w.WriteHeader(http.StatusOK)
 			return
 		}
+		fmt.Println("Auth Token")
 		fmt.Println(r.Header.Get("Authorization"))
 		authToken := r.Header.Get("Authorization")
 		var ctx context.Context
