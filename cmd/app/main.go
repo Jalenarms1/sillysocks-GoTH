@@ -40,7 +40,7 @@ func userMiddleware(next http.Handler) http.Handler {
 				Path:     "/",
 				Secure:   true,
 				SameSite: http.SameSiteNoneMode,
-				Domain:   os.Getenv("CLIENT_DOMAIN"),
+				Domain:   "sillysocksandmore.com",
 			})
 
 			ctx = context.WithValue(r.Context(), handlers.UserCtxKey, localId.String())
