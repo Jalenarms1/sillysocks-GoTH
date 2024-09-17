@@ -39,6 +39,7 @@ func userMiddleware(next http.Handler) http.Handler {
 				Value:    localId.String(),
 				Path:     "/",
 				Secure:   true,
+				HttpOnly: true,
 				SameSite: http.SameSiteNoneMode,
 				Domain:   "sillysocksandmore.com",
 			})
