@@ -104,6 +104,7 @@ func handleCreateCheckout(w http.ResponseWriter, r *http.Request) error {
 			"userUid": r.Context().Value(UserCtxKey).(string),
 		},
 	}
+	fmt.Println("Calling to stripe")
 	session, err := session.New(params)
 
 	if err != nil {
