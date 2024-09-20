@@ -28,10 +28,8 @@ func userMiddleware(next http.Handler) http.Handler {
 		}
 		ck, _ := r.Cookie("silly-socks-user")
 		fmt.Println("Cookie", ck)
-		fmt.Println(r.Header.Get("Authorization"))
-		authToken := r.Header.Get("Authorization")
 		var ctx context.Context
-		if authToken == "" {
+		if ck == nil {
 			fmt.Println("Token empty")
 			localId, _ := uuid.NewV4()
 
@@ -47,7 +45,7 @@ func userMiddleware(next http.Handler) http.Handler {
 			ctx = context.WithValue(r.Context(), handlers.UserCtxKey, localId.String())
 
 		} else {
-			ctx = context.WithValue(r.Context(), handlers.UserCtxKey, authToken)
+			ctx = context.WithValue(r.Context(), handlers.UserCtxKey, ck.Value)
 
 		}
 
