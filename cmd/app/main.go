@@ -37,7 +37,7 @@ func userMiddleware(next http.Handler) http.Handler {
 				Name:     "silly-socks-user",
 				Value:    localId.String(),
 				Path:     "/",
-				Secure:   true,
+				Secure:   false,
 				HttpOnly: true,
 				SameSite: http.SameSiteNoneMode,
 			})
