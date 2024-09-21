@@ -29,18 +29,18 @@ func userMiddleware(next http.Handler) http.Handler {
 		ck, _ := r.Cookie("silly-socks-user")
 		fmt.Println("Cookie", ck)
 		var ctx context.Context
-		fmt.Println("Token empty")
-		localId, _ := uuid.NewV4()
 
-		http.SetCookie(w, &http.Cookie{
-			Name:     "silly-socks-user",
-			Value:    localId.String(),
-			Path:     "/",
-			Secure:   false,
-			HttpOnly: true,
-			SameSite: http.SameSiteNoneMode,
-		})
 		if ck == nil {
+			fmt.Println("Token empty")
+			localId, _ := uuid.NewV4()
+			http.SetCookie(w, &http.Cookie{
+				Name:     "silly-socks-user",
+				Value:    localId.String(),
+				Path:     "/",
+				Secure:   false,
+				HttpOnly: true,
+				SameSite: http.SameSiteNoneMode,
+			})
 
 			ctx = context.WithValue(r.Context(), handlers.UserCtxKey, localId.String())
 
