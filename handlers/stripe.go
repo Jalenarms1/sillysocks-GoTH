@@ -38,7 +38,6 @@ func handleCreateCheckout(w http.ResponseWriter, r *http.Request) error {
 	}
 	fmt.Println(cart)
 	userUid := r.Context().Value(UserCtxKey).(string)
-	fmt.Println("saved")
 	userDb, uErr := db.GetDb(uuid.FromStringOrNil(userUid))
 	if uErr != nil {
 		return uErr
@@ -46,6 +45,7 @@ func handleCreateCheckout(w http.ResponseWriter, r *http.Request) error {
 	if sErr := cart.Save(userDb); sErr != nil {
 		return sErr
 	}
+	fmt.Println("saved")
 	var lineItems []*stripe.CheckoutSessionLineItemParams
 	var total int64
 	for _, i := range cart {
