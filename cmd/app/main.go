@@ -52,6 +52,7 @@ func userMiddleware(next http.Handler) http.Handler {
 		} else {
 			fmt.Println("not found")
 			http.NotFound(w, r)
+			return
 		}
 
 		next.ServeHTTP(w, r.WithContext(ctx))
