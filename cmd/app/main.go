@@ -35,7 +35,7 @@ func userMiddleware(next http.Handler) http.Handler {
 		token := r.Header.Get("Authorization")
 		var ctx context.Context
 		fmt.Println(r.URL.Path)
-		if token != "" || r.URL.Path == "/api/user/token" {
+		if token != "" || r.URL.Path == "/api/user/token" || r.URL.Path == "/api/stripe/webhook" {
 			fmt.Println("Token found", token)
 			// http.SetCookie(w, &http.Cookie{
 			// 	Name:     "silly-socks-user",
