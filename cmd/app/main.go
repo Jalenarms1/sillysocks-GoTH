@@ -34,6 +34,7 @@ func userMiddleware(next http.Handler) http.Handler {
 
 		token := r.Header.Get("Authorization")
 		var ctx context.Context
+		fmt.Println(r.URL.Path)
 		if token != "" || r.URL.Path == "/api/user/token" {
 			fmt.Println("Token found", token)
 			// http.SetCookie(w, &http.Cookie{
