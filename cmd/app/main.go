@@ -12,7 +12,6 @@ import (
 	"github.com/Jalenarms1/sillysocks-GoTH/db"
 	"github.com/Jalenarms1/sillysocks-GoTH/handlers"
 	"github.com/go-chi/chi/v5"
-	"github.com/joho/godotenv"
 )
 
 func userMiddleware(next http.Handler) http.Handler {
@@ -61,9 +60,9 @@ func userMiddleware(next http.Handler) http.Handler {
 
 func main() {
 
-	if err := godotenv.Load(); err != nil {
-		log.Fatal(err)
-	}
+	// if err := godotenv.Load(); err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	db.InitDB(os.Getenv("MASTER_DB_URL"))
 	defer db.CloseDB()
