@@ -32,9 +32,7 @@ func userMiddleware(next http.Handler) http.Handler {
 		// 	isMobile := mh[0] == os.Getenv("MOBILE_TOKEN")
 		// }
 
-		ck, _ := r.Cookie("silly-socks-user")
 		token := r.Header.Get("Authorization")
-		fmt.Println("Cookie", ck)
 		var ctx context.Context
 		if token != "" || r.URL.Path == "/api/user/token" {
 			fmt.Println("Token found", token)
