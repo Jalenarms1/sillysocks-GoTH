@@ -181,7 +181,6 @@ func createDatabase(token uuid.UUID) (*sqlx.DB, error) {
 	mu.Lock()
 	defer mu.Unlock()
 	dbStore[token.String()] = nDb
-
 	return nDb, nil
 }
 

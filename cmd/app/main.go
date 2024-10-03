@@ -8,12 +8,11 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/Jalenarms1/sillysocks-GoTH/db"
 	"github.com/Jalenarms1/sillysocks-GoTH/handlers"
 	"github.com/go-chi/chi/v5"
-	"github.com/gofrs/uuid"
+	"github.com/joho/godotenv"
 )
 
 func userMiddleware(next http.Handler) http.Handler {
@@ -21,34 +20,39 @@ func userMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", os.Getenv("CLIENT_DOMAIN"))
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusOK)
 			return
 		}
+
+		// mh := r.Header["X-silly-socks-app"]
+
+		// if mh != nil {
+		// 	isMobile := mh[0] == os.Getenv("MOBILE_TOKEN")
+		// }
+
 		ck, _ := r.Cookie("silly-socks-user")
-		ck.Expires.After(time.Now())
+		token := r.Header.Get("Authorization")
 		fmt.Println("Cookie", ck)
 		var ctx context.Context
+		if token != "" || r.URL.Path == "/api/user/token" {
+			fmt.Println("Token found", token)
+			// http.SetCookie(w, &http.Cookie{
+			// 	Name:     "silly-socks-user",
+			// 	Value:    localId.String(),
+			// 	Path:     "/",
+			// 	Secure:   false,
+			// 	HttpOnly: true,
+			// 	SameSite: http.SameSiteNoneMode,
+			// })
 
-		if ck == nil {
-			fmt.Println("Token empty")
-			localId, _ := uuid.NewV4()
-			http.SetCookie(w, &http.Cookie{
-				Name:     "silly-socks-user",
-				Value:    localId.String(),
-				Path:     "/",
-				Secure:   false,
-				HttpOnly: true,
-				SameSite: http.SameSiteNoneMode,
-			})
-
-			ctx = context.WithValue(r.Context(), handlers.UserCtxKey, localId.String())
+			ctx = context.WithValue(r.Context(), handlers.UserCtxKey, token)
 
 		} else {
-			ctx = context.WithValue(r.Context(), handlers.UserCtxKey, ck.Value)
-
+			fmt.Println("not found")
+			http.NotFound(w, r)
 		}
 
 		next.ServeHTTP(w, r.WithContext(ctx))
@@ -57,9 +61,9 @@ func userMiddleware(next http.Handler) http.Handler {
 
 func main() {
 
-	// if err := godotenv.Load(); err != nil {
-	// 	log.Fatal(err)
-	// }
+	if err := godotenv.Load(); err != nil {
+		log.Fatal(err)
+	}
 
 	db.InitDB(os.Getenv("MASTER_DB_URL"))
 	defer db.CloseDB()
@@ -76,7 +80,7 @@ func main() {
 
 	handlers.RegisterRouter(router)
 
-	router.Get("/", handlers.UseHTTPHandler(handlers.HandleRoot))
+	// router.Get("/", handlers.UseHTTPHandler(handlers.HandleRoot))
 	fmt.Printf("http://localhost%s\n", listenAddr)
 	log.Fatal(http.ListenAndServe(listenAddr, router))
 }

@@ -1,16 +1,13 @@
-build_dir="./bin/sillysocks-GoTH.exe"
+build_dir="./bin/sillysocks-GoTH"
 
 tailwind:
 	@npx tailwindcss -i ./tailwind.css -o ./public/tailwind.css
 
-templ:
-	@templ generate
-
 run: build
-	@$(build_dir)
+	@chmod +x $(build_dir)
 
-build: templ
+build: 
 	@go build -o $(build_dir) ./cmd/app
 
-watch: templ
-	@air --build.cmd "go build -o $(build_dir) ./cmd/app" --build.bin ".\bin\sillysocks-GoTH.exe" --build.exclude_dir="node_modules"
+watch: 
+	@air --build.cmd "go build -o $(build_dir) ./cmd/app" --build.bin "./bin/sillysocks-GoTH" --build.exclude_dir="node_modules"
