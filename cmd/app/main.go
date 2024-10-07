@@ -17,6 +17,7 @@ import (
 func userMiddleware(next http.Handler) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 		w.Header().Set("Access-Control-Allow-Origin", os.Getenv("CLIENT_DOMAIN"))
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
@@ -37,19 +38,11 @@ func userMiddleware(next http.Handler) http.Handler {
 		fmt.Println(r.URL.Path)
 		if token != "" || r.URL.Path == "/api/user/token" || r.URL.Path == "/api/stripe/webhook" {
 			fmt.Println("Token found", token)
-			// http.SetCookie(w, &http.Cookie{
-			// 	Name:     "silly-socks-user",
-			// 	Value:    localId.String(),
-			// 	Path:     "/",
-			// 	Secure:   false,
-			// 	HttpOnly: true,
-			// 	SameSite: http.SameSiteNoneMode,
-			// })
 
 			ctx = context.WithValue(r.Context(), handlers.UserCtxKey, token)
 
 		} else {
-			fmt.Println("not found")
+			fmt.Println("not found", token)
 			http.NotFound(w, r)
 			return
 		}

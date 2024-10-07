@@ -9,4 +9,5 @@ func RegisterRouter(router *chi.Mux) {
 	// RegisterCartRouter(router)
 	RegisterStripeRouter(router)
 	RegisterAuth(router)
+	RegisterAdmin(router)
 }

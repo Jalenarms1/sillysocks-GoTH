@@ -9,5 +9,5 @@ run: build
 build: 
 	@go build -o $(build_dir) ./cmd/app
 
-watch: 
-	@air --build.cmd "go build -o $(build_dir) ./cmd/app" --build.bin "./bin/sillysocks-GoTH" --build.exclude_dir="node_modules"
+watch: build
+	@go run github.com/cosmtrek/air@v1.51.0
