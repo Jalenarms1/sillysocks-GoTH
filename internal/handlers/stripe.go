@@ -148,7 +148,7 @@ func HandleCheckoutSessionWebhook(w http.ResponseWriter, r *http.Request) {
 
 	stripeSig := r.Header.Get("Stripe-Signature")
 	fmt.Println(stripeSig)
-	event, err := webhook.ConstructEvent(body, stripeSig, os.Getenv("STRIPE_WHKEY"))
+	event, err := webhook.ConstructEventWithOptions(body, stripeSig, os.Getenv("STRIPE_WHKEY"), webhook.ConstructEventOptions{IgnoreAPIVersionMismatch: true})
 	if err != nil {
 		fmt.Println(err.Error())
 		http.Error(w, "Not authorized to access the endpoint requested "+err.Error(), http.StatusBadRequest)
