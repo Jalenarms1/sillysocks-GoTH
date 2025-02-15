@@ -120,7 +120,7 @@ func HandleCreateCheckoutSession(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error creating checkout session", http.StatusBadRequest)
 		return
 	}
-	fmt.Println(session.URL)
+	// fmt.Println(session.URL)
 
 	resp := map[string]string{
 		"sessionUrl": session.URL,
