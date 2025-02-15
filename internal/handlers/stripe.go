@@ -176,7 +176,7 @@ func HandleCheckoutSessionWebhook(w http.ResponseWriter, r *http.Request) {
 
 			fmt.Println("Existing Order")
 			existingOrder := db.GetOrder(orderId)
-			fmt.Printf("%s", existingOrder)
+			fmt.Println(existingOrder)
 			if existingOrder == nil {
 				http.Error(w, "Order not found "+orderId, http.StatusBadRequest)
 				return
