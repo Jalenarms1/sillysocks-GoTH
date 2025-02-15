@@ -66,8 +66,10 @@ func HandleCreateCheckoutSession(w http.ResponseWriter, r *http.Request) {
 			Currency:   stripe.String("usd"),
 		},
 	}
-
+	fmt.Println(total)
+	fmt.Println(float64(total/100) * 1.08)
 	tax := int64((float64(total/100)*1.08)*100) - total
+	fmt.Println(tax)
 	taxItem := stripe.CheckoutSessionLineItemParams{
 		Quantity: stripe.Int64(int64(1)),
 		PriceData: &stripe.CheckoutSessionLineItemPriceDataParams{
