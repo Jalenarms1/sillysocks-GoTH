@@ -67,6 +67,7 @@ func HandleCreateCheckoutSession(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 	fmt.Println(total)
+	fmt.Println(float64(total / 100))
 	fmt.Println(int64((float64(total/100) * 1.08) * 100))
 	tax := int64((float64(total/100)*1.08)*100) - total
 	fmt.Println(tax)
