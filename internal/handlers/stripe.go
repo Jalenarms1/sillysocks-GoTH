@@ -147,7 +147,7 @@ func HandleCheckoutSessionWebhook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	stripeSig := r.Header.Get("Stripe-Signature")
-
+	fmt.Println(stripeSig)
 	event, err := webhook.ConstructEvent(body, stripeSig, os.Getenv("STRIPE_WHKEY"))
 	if err != nil {
 		fmt.Println(err.Error())
