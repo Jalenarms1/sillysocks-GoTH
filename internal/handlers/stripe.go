@@ -165,12 +165,12 @@ func HandleCheckoutSessionWebhook(w http.ResponseWriter, r *http.Request) {
 			orderId := event.Data.Object["metadata"].(map[string]interface{})["orderId"].(string)
 			paymentIntent := event.Data.Object["payment_intent"].(*string)
 			customerDetails := event.Data.Object["customer_details"]
-			address := customerDetails.(map[string]map[string]interface{})["address"]
-			line1 := address["line1"].(*string)
-			line2 := address["line2"].(*string)
-			city := address["city"].(*string)
-			state := address["state"].(*string)
-			postalCode := address["postal_code"].(*string)
+			address := customerDetails.(map[string]map[string]*string)["address"]
+			line1 := address["line1"]
+			line2 := address["line2"]
+			city := address["city"]
+			state := address["state"]
+			postalCode := address["postal_code"]
 			name := customerDetails.(map[string]string)["name"]
 			email := customerDetails.(map[string]string)["email"]
 
