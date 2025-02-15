@@ -154,7 +154,8 @@ func HandleCheckoutSessionWebhook(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Not authorized to access the endpoint requested "+err.Error(), http.StatusBadRequest)
 		return
 	}
-
+	fmt.Print(event.Type)
+	fmt.Println(stripe.EventTypeCheckoutSessionCompleted)
 	if event.Type == stripe.EventTypeCheckoutSessionCompleted {
 		fmt.Print(event.Data.Object["metadata"].(map[string]interface{})["orderId"])
 		status := event.Data.Object["payment_status"]
