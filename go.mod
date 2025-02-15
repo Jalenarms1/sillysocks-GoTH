@@ -19,6 +19,11 @@ require (
 require github.com/joho/godotenv v1.5.1
 
 require (
+	github.com/stripe/stripe-go v70.15.0+incompatible // indirect
+	github.com/stripe/stripe-go/v81 v81.3.1 // indirect
+)
+
+require (
 	github.com/antlr4-go/antlr/v4 v4.13.0 // indirect
 	github.com/coder/websocket v1.8.12 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.1

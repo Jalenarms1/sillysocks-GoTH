@@ -16,6 +16,6 @@ COPY --from=builder /app/bin .
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 
-EXPOSE 3000
+EXPOSE 8080
 
 CMD ["./sillysocks-GoTH"]
