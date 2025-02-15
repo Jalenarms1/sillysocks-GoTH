@@ -159,7 +159,8 @@ func HandleCheckoutSessionWebhook(w http.ResponseWriter, r *http.Request) {
 	if event.Type == stripe.EventTypeCheckoutSessionCompleted {
 		fmt.Print(event.Data.Object["metadata"].(map[string]interface{})["orderId"])
 		status := event.Data.Object["payment_status"]
-
+		fmt.Println(status)
+		fmt.Println(stripe.CheckoutSessionPaymentStatusPaid)
 		if status == stripe.CheckoutSessionPaymentStatusPaid {
 			orderId := event.Data.Object["metadata"].(map[string]interface{})["orderId"].(string)
 			paymentIntent := event.Data.Object["payment_intent"].(*string)
