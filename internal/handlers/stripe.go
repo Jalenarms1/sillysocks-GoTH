@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/Jalenarms1/sillysocks-GoTH/internal/db"
@@ -69,7 +70,9 @@ func HandleCreateCheckoutSession(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(total)
 	fmt.Println(float64(total) / 100)
 	fmt.Println(int64((float64(total/100) * 1.08) * 100))
-	tax := int64(((float64(total)/100)*1.08)*100) - total
+	val, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", ((float64(total)/100)*1.08)), 64)
+	fmt.Println(val)
+	tax := int64(val*100) - total
 	fmt.Println(tax)
 	taxItem := stripe.CheckoutSessionLineItemParams{
 		Quantity: stripe.Int64(int64(1)),
