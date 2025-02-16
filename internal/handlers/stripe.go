@@ -166,13 +166,13 @@ func HandleCheckoutSessionWebhook(w http.ResponseWriter, r *http.Request) {
 			paymentIntent := event.Data.Object["payment_intent"].(string)
 			customerDetails := event.Data.Object["customer_details"]
 			address := customerDetails.(map[string]interface{})["address"].(map[string]interface{})
-			line1 := address["line1"].(*string)
-			line2 := address["line2"].(*string)
-			city := address["city"].(*string)
-			state := address["state"].(*string)
-			postalCode := address["postal_code"].(*string)
-			name := customerDetails.(map[string]interface{})["name"].(*string)
-			email := customerDetails.(map[string]interface{})["email"].(*string)
+			line1 := address["line1"].(string)
+
+			city := address["city"].(string)
+			state := address["state"].(string)
+			postalCode := address["postal_code"].(string)
+			name := customerDetails.(map[string]interface{})["name"].(string)
+			email := customerDetails.(map[string]interface{})["email"].(string)
 
 			fmt.Println("Existing Order")
 			existingOrder := db.GetOrder(orderId)
@@ -183,14 +183,21 @@ func HandleCheckoutSessionWebhook(w http.ResponseWriter, r *http.Request) {
 			}
 
 			existingOrder.PaymentIntentId = &paymentIntent
-			existingOrder.ShippingLine1 = line1
-			existingOrder.ShippingLine2 = line2
-			existingOrder.ShippingCity = city
-			existingOrder.ShippingState = state
-			existingOrder.ShippingPostalCode = postalCode
+			existingOrder.ShippingLine1 = &line1
+			line2, ok := address["line2"].(string)
+			if !ok {
+				line2 := address["line2"].(*string)
+				existingOrder.ShippingLine2 = line2
+			} else {
+				existingOrder.ShippingLine2 = &line2
+
+			}
+			existingOrder.ShippingCity = &city
+			existingOrder.ShippingState = &state
+			existingOrder.ShippingPostalCode = &postalCode
 			existingOrder.Status = "Paid"
-			existingOrder.CustomerName = name
-			existingOrder.CustomerEmail = email
+			existingOrder.CustomerName = &name
+			existingOrder.CustomerEmail = &email
 
 			err := existingOrder.Save()
 			if err != nil {
