@@ -113,6 +113,13 @@ func InsertCartItems(tx *sql.Tx, cartItems []CartItem, orderId string) error {
 
 	}
 
+	fmt.Printf(
+		"INSERT INTO CartItem (Id, ProductId, OrderId, Quantity, SubTotal) VALUES %s",
+		strings.Join(queryStrings, ", "),
+	)
+
+	fmt.Println(queryArgs)
+
 	_, err := tx.Exec("insert into CartItem (Id, ProductId, OrderId, Quantity, SubTotal) values "+strings.Join(queryStrings, ", "), queryArgs...)
 
 	return err
