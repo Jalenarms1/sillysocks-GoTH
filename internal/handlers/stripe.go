@@ -197,6 +197,7 @@ func HandleCheckoutSessionWebhook(w http.ResponseWriter, r *http.Request) {
 
 			err := existingOrder.Save()
 			if err != nil {
+				fmt.Println(err)
 				http.Error(w, "Error saving the updated order data", http.StatusBadRequest)
 				return
 			}
