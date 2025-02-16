@@ -185,12 +185,8 @@ func HandleCheckoutSessionWebhook(w http.ResponseWriter, r *http.Request) {
 			existingOrder.PaymentIntentId = &paymentIntent
 			existingOrder.ShippingLine1 = &line1
 			line2, ok := address["line2"].(string)
-			if !ok {
-				line2 := address["line2"].(*string)
-				existingOrder.ShippingLine2 = line2
-			} else {
+			if ok {
 				existingOrder.ShippingLine2 = &line2
-
 			}
 			existingOrder.ShippingCity = &city
 			existingOrder.ShippingState = &state
