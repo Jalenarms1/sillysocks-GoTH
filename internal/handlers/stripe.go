@@ -197,7 +197,10 @@ func HandleCheckoutSessionWebhook(w http.ResponseWriter, r *http.Request) error 
 			email := customerDetails.(map[string]interface{})["email"].(string)
 
 			fmt.Println("Existing Order")
-			existingOrder := db.GetOrder(orderId)
+			existingOrder, err := db.GetOrder(orderId)
+			if err != nil {
+				return err
+			}
 			fmt.Println(existingOrder)
 			if existingOrder == nil {
 				return errors.New("order not found " + orderId)
@@ -216,7 +219,7 @@ func HandleCheckoutSessionWebhook(w http.ResponseWriter, r *http.Request) error 
 			existingOrder.CustomerName = &name
 			existingOrder.CustomerEmail = &email
 
-			err := existingOrder.Save()
+			err = existingOrder.Save()
 			if err != nil {
 				fmt.Println(err)
 				return err

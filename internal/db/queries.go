@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -68,19 +69,24 @@ func (o *Order) Insert(tx *sql.Tx) error {
 	return nil
 }
 
-func GetOrder(id string) *Order {
+func GetOrder(id string) (*Order, error) {
 	row := DB.QueryRow(`select Id, PaymentIntentId, SubTotal, Tax, GrandTotal, ShippingTotal, ShippingLine1, ShippingLine2, ShippingCity, ShippingState, ShippingPostalCode, CustomerName, CustomerEmail, CreatedAt, Status from "Order" where Id = ?`, id)
 	if row == nil {
-		return nil
+		return nil, errors.New("order not found")
 	}
 
 	var order Order
 	err := row.Scan(&order.Id, &order.PaymentIntentId, &order.SubTotal, &order.Tax, &order.GrandTotal, &order.ShippingTotal, &order.ShippingLine1, &order.ShippingLine2, &order.ShippingCity, &order.ShippingState, &order.ShippingPostalCode, &order.CustomerName, &order.CustomerEmail, &order.CreatedAt, &order.Status)
 	if err != nil {
-		return nil
+		return nil, errors.New("error scanning data into order")
 	}
 
-	return &order
+	err = order.LoadCartItems()
+	if err != nil {
+		return nil, err
+	}
+
+	return &order, nil
 }
 
 func (o *Order) Save() error {
@@ -91,6 +97,29 @@ func (o *Order) Save() error {
 
 	return nil
 
+}
+
+func (o *Order) LoadCartItems() error {
+
+	var cartItems []CartItem
+	res, err := DB.Query("select Id, ProductId, OrderId, Quantity, SubTotal from CartItem where OrderId = ?", o.Id)
+	if err != nil {
+		return err
+	}
+
+	for res.Next() {
+		var ci CartItem
+		err := res.Scan(&ci.Id, &ci.ProductId, &ci.OrderId, &ci.Quantity, &ci.SubTotal)
+		if err != nil {
+			return err
+		}
+
+		cartItems = append(cartItems, ci)
+	}
+
+	o.CartItems = cartItems
+
+	return nil
 }
 
 func InsertCartItems(tx *sql.Tx, cartItems []CartItem, orderId string) error {
