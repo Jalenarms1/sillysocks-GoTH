@@ -7,11 +7,11 @@ import (
 )
 
 func registerRoutes(mux *http.ServeMux) http.Handler {
-	mux.HandleFunc("/products", handlers.HandleGetProducts)
-	mux.HandleFunc("/products/{id}", handlers.HandleGetProduct)
+	mux.HandleFunc("/products", handlers.ErrorCatchHandler(handlers.HandleGetProducts))
+	mux.HandleFunc("/products/{id}", handlers.ErrorCatchHandler(handlers.HandleGetProduct))
 
-	mux.HandleFunc("/checkout", handlers.HandleCreateCheckoutSession)
-	mux.HandleFunc("/checkout-wh", handlers.HandleCheckoutSessionWebhook)
+	mux.HandleFunc("/checkout", handlers.ErrorCatchHandler(handlers.HandleCreateCheckoutSession))
+	mux.HandleFunc("/checkout-wh", handlers.ErrorCatchHandler(handlers.HandleCheckoutSessionWebhook))
 
 	wrappedMux := handlers.UseCors(mux)
 

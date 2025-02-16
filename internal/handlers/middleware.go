@@ -1,6 +1,9 @@
 package handlers
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
+)
 
 func UseCors(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -15,5 +18,20 @@ func UseCors(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+
+}
+
+type ErrorHandlerFunc func(w http.ResponseWriter, r *http.Request) error
+
+func ErrorCatchHandler(fn ErrorHandlerFunc) func(w http.ResponseWriter, r *http.Request) {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		if err := fn(w, r); err != nil {
+			fmt.Println(err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+
+		}
+
+	}
 
 }

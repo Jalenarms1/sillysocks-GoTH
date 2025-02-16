@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -20,10 +21,10 @@ type CheckoutSessionReqParams struct {
 	CartItems []db.CartItem
 }
 
-func HandleCreateCheckoutSession(w http.ResponseWriter, r *http.Request) {
+func HandleCreateCheckoutSession(w http.ResponseWriter, r *http.Request) error {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
+		return errors.New("method not allowed")
 	}
 
 	// body, err := io.ReadAll(r.Body)
@@ -36,7 +37,7 @@ func HandleCreateCheckoutSession(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&cartItemData)
 	if err != nil {
 		http.Error(w, "Invalid body", http.StatusBadRequest)
-		return
+		return err
 	}
 
 	var total int64
@@ -118,13 +119,13 @@ func HandleCreateCheckoutSession(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 		http.Error(w, "Error creating the order", http.StatusBadRequest)
-		return
+		return err
 	}
 
 	session, err := session.New(params)
 	if err != nil {
 		http.Error(w, "Error creating checkout session", http.StatusBadRequest)
-		return
+		return err
 	}
 	// fmt.Println(session.URL)
 
@@ -136,14 +137,17 @@ func HandleCreateCheckoutSession(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)
 
+	return nil
+
 }
 
-func HandleCheckoutSessionWebhook(w http.ResponseWriter, r *http.Request) {
+func HandleCheckoutSessionWebhook(w http.ResponseWriter, r *http.Request) error {
 
 	body, err := io.ReadAll(r.Body)
+	defer r.Body.Close()
 	if err != nil {
 		http.Error(w, "Invalid body", http.StatusBadRequest)
-		return
+		return err
 	}
 
 	stripeSig := r.Header.Get("Stripe-Signature")
@@ -152,7 +156,7 @@ func HandleCheckoutSessionWebhook(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println(err.Error())
 		http.Error(w, "Not authorized to access the endpoint requested "+err.Error(), http.StatusBadRequest)
-		return
+		return err
 	}
 	fmt.Print(event.Type)
 	fmt.Println(stripe.EventTypeCheckoutSessionCompleted)
@@ -179,7 +183,7 @@ func HandleCheckoutSessionWebhook(w http.ResponseWriter, r *http.Request) {
 			fmt.Println(existingOrder)
 			if existingOrder == nil {
 				http.Error(w, "Order not found "+orderId, http.StatusBadRequest)
-				return
+				return errors.New("order not found " + orderId)
 			}
 
 			existingOrder.PaymentIntentId = &paymentIntent
@@ -199,7 +203,7 @@ func HandleCheckoutSessionWebhook(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				fmt.Println(err)
 				http.Error(w, "Error saving the updated order data", http.StatusBadRequest)
-				return
+				return err
 			}
 
 		}
@@ -207,5 +211,5 @@ func HandleCheckoutSessionWebhook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-
+	return nil
 }
