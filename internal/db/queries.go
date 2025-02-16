@@ -97,8 +97,8 @@ func InsertCartItems(tx *sql.Tx, cartItems []CartItem, orderId string) error {
 	queryStrings := make([]string, len(cartItems))
 	queryArgs := []interface{}{}
 
-	for _, item := range cartItems {
-		queryStrings = append(queryStrings, "(?, ?, ?, ?, ?)")
+	for i, item := range cartItems {
+		queryStrings[i] = "(?, ?, ?, ?, ?)"
 		fmt.Println(item.Id)
 		fmt.Println(item.Product.Id)
 		fmt.Println(orderId)
