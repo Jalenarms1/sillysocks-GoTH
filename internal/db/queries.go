@@ -83,7 +83,7 @@ func GetOrder(id string) *Order {
 }
 
 func (o *Order) Save() error {
-	_, err := DB.Exec(`update set Id = ?, PaymentIntentId = ?, SubTotal = ?, Tax = ?, GrandTotal = ?, ShippingTotal = ?, ShippingLine1 = ?, ShippingLine2 = ?, ShippingCity = ?, ShippingState = ?, ShippingPostalCode = ?, CustomerName = ?, CustomerEmail = ?, CreatedAt = ?, Status = ? from "Order" where Id = ?`, o.Id, o.PaymentIntentId, o.SubTotal, o.Tax, o.GrandTotal, o.ShippingTotal, o.ShippingLine1, o.ShippingLine2, o.ShippingCity, o.ShippingState, o.ShippingPostalCode, o.CustomerName, o.CustomerEmail, o.CreatedAt, o.Status, o.Id)
+	_, err := DB.Exec(`update "Order" set Id = ?, PaymentIntentId = ?, SubTotal = ?, Tax = ?, GrandTotal = ?, ShippingTotal = ?, ShippingLine1 = ?, ShippingLine2 = ?, ShippingCity = ?, ShippingState = ?, ShippingPostalCode = ?, CustomerName = ?, CustomerEmail = ?, CreatedAt = ?, Status = ? where Id = ?`, o.Id, o.PaymentIntentId, o.SubTotal, o.Tax, o.GrandTotal, o.ShippingTotal, o.ShippingLine1, o.ShippingLine2, o.ShippingCity, o.ShippingState, o.ShippingPostalCode, o.CustomerName, o.CustomerEmail, o.CreatedAt, o.Status, o.Id)
 	if err != nil {
 		return err
 	}
