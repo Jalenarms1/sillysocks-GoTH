@@ -14,7 +14,7 @@ func HandleGetOrder(w http.ResponseWriter, r *http.Request) error {
 		return nil
 	}
 
-	orderId := r.URL.Path[len("/order"):]
+	orderId := r.URL.Path[len("/order")-1:]
 
 	order := db.GetOrder((orderId))
 	if order == nil {
