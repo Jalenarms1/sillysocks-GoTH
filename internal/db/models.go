@@ -15,6 +15,7 @@ type CartItem struct {
 	Id        string  `db:"Id" json:"id"`
 	ProductId string  `db:"ProductId" json:"productId"`
 	Product   Product `db:"Product" json:"product,omitempty"`
+	OrderId   *string `db:"OrderId" json:"orderId"`
 	Quantity  int32   `db:"Quantity" json:"quantity"`
 	SubTotal  int64   `db:"SubTotal" json:"subTotal"`
 }

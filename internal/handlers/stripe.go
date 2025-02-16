@@ -56,6 +56,7 @@ func HandleCreateCheckoutSession(w http.ResponseWriter, r *http.Request) error {
 		}
 
 		lineItems = append(lineItems, &lineItem)
+
 	}
 
 	shippingItem := stripe.CheckoutSessionLineItemParams{
@@ -100,6 +101,22 @@ func HandleCreateCheckoutSession(w http.ResponseWriter, r *http.Request) error {
 		Status:        "Unpaid",
 	}
 
+	tx, err := db.DB.Begin()
+	if err != nil {
+		return err
+	}
+	err = order.Insert(tx)
+	if err != nil {
+		_ = tx.Rollback()
+		return err
+	}
+
+	err = db.InsertCartItems(tx, cartItemData.CartItems, order.Id)
+	if err != nil {
+		_ = tx.Rollback()
+		return err
+	}
+
 	fmt.Printf("%s/cart", os.Getenv("CLIENT_DOMAIN"))
 	params := &stripe.CheckoutSessionParams{
 		PaymentMethodTypes: stripe.StringSlice([]string{"card"}),
@@ -115,17 +132,18 @@ func HandleCreateCheckoutSession(w http.ResponseWriter, r *http.Request) error {
 		},
 	}
 
-	err = order.Insert()
-	if err != nil {
-		fmt.Println(err)
-		http.Error(w, "Error creating the order", http.StatusBadRequest)
-		return err
-	}
+	// create cart item records
 
 	session, err := session.New(params)
 	if err != nil {
-		http.Error(w, "Error creating checkout session", http.StatusBadRequest)
+		_ = tx.Rollback()
+
 		return err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return errors.New("Error committing the order transaction for order id, " + order.Id)
 	}
 	// fmt.Println(session.URL)
 

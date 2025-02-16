@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"strings"
 )
 
 func GetProducts() []Product {
@@ -42,8 +43,8 @@ func GetProduct(id string) *Product {
 
 }
 
-func (o *Order) Insert() error {
-	resp, err := DB.Exec(`
+func (o *Order) Insert(tx *sql.Tx) error {
+	resp, err := tx.Exec(`
 		INSERT INTO "Order" (
 			Id, SubTotal, Tax, GrandTotal, ShippingTotal, ShippingLine1, ShippingLine2, 
 			ShippingCity, ShippingState, ShippingPostalCode, CustomerName, CustomerEmail, 
@@ -89,5 +90,25 @@ func (o *Order) Save() error {
 	}
 
 	return nil
+
+}
+
+func InsertCartItems(tx *sql.Tx, cartItems []CartItem, orderId string) error {
+	queryStrings := make([]string, len(cartItems))
+	queryArgs := []interface{}{}
+
+	for _, item := range cartItems {
+		queryStrings = append(queryStrings, "(?, ?, ?, ?, ?)")
+		queryArgs = append(queryArgs, item.Id)
+		queryArgs = append(queryArgs, item.Product.Id)
+		queryArgs = append(queryArgs, orderId)
+		queryArgs = append(queryArgs, item.Quantity)
+		queryArgs = append(queryArgs, item.SubTotal)
+
+	}
+
+	_, err := tx.Exec("insert into CartItem (Id, ProductId, OrderId, Quantity, SubTotal) values "+strings.Join(queryStrings, ", "), queryArgs...)
+
+	return err
 
 }
