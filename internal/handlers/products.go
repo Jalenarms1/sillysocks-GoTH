@@ -34,7 +34,6 @@ func HandleGetProduct(w http.ResponseWriter, r *http.Request) error {
 	product := db.GetProduct(id)
 
 	if product == nil {
-		http.Error(w, "Product not found", http.StatusNotFound)
 		return errors.New("product not found")
 	}
 

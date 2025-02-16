@@ -182,7 +182,6 @@ func HandleCheckoutSessionWebhook(w http.ResponseWriter, r *http.Request) error 
 			existingOrder := db.GetOrder(orderId)
 			fmt.Println(existingOrder)
 			if existingOrder == nil {
-				http.Error(w, "Order not found "+orderId, http.StatusBadRequest)
 				return errors.New("order not found " + orderId)
 			}
 
@@ -202,7 +201,6 @@ func HandleCheckoutSessionWebhook(w http.ResponseWriter, r *http.Request) error 
 			err := existingOrder.Save()
 			if err != nil {
 				fmt.Println(err)
-				http.Error(w, "Error saving the updated order data", http.StatusBadRequest)
 				return err
 			}
 
