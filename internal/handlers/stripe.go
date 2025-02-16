@@ -172,8 +172,6 @@ func HandleCheckoutSessionWebhook(w http.ResponseWriter, r *http.Request) error 
 	fmt.Println(stripeSig)
 	event, err := webhook.ConstructEventWithOptions(body, stripeSig, os.Getenv("STRIPE_WHKEY"), webhook.ConstructEventOptions{IgnoreAPIVersionMismatch: true})
 	if err != nil {
-		fmt.Println(err.Error())
-		http.Error(w, "Not authorized to access the endpoint requested "+err.Error(), http.StatusBadRequest)
 		return err
 	}
 	fmt.Print(event.Type)
@@ -221,7 +219,6 @@ func HandleCheckoutSessionWebhook(w http.ResponseWriter, r *http.Request) error 
 
 			err = existingOrder.Save()
 			if err != nil {
-				fmt.Println(err)
 				return err
 			}
 
