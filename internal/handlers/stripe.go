@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/Jalenarms1/sillysocks-GoTH/internal/db"
+	"github.com/Jalenarms1/sillysocks-GoTH/internal/utils"
 	"github.com/gofrs/uuid"
 	stripe "github.com/stripe/stripe-go/v81"
 	"github.com/stripe/stripe-go/v81/checkout/session"
@@ -132,8 +133,6 @@ func HandleCreateCheckoutSession(w http.ResponseWriter, r *http.Request) error {
 		},
 	}
 
-	// create cart item records
-
 	session, err := session.New(params)
 	if err != nil {
 		_ = tx.Rollback()
@@ -145,6 +144,8 @@ func HandleCreateCheckoutSession(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return errors.New("Error committing the order transaction for order id, " + order.Id)
 	}
+
+	err = utils.SendMail("")
 	// fmt.Println(session.URL)
 
 	resp := map[string]string{
