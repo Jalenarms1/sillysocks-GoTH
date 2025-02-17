@@ -145,7 +145,6 @@ func HandleCreateCheckoutSession(w http.ResponseWriter, r *http.Request) error {
 		return errors.New("Error committing the order transaction for order id, " + order.Id)
 	}
 
-	err = utils.SendMail("")
 	// fmt.Println(session.URL)
 
 	resp := map[string]string{
@@ -227,6 +226,10 @@ func HandleCheckoutSessionWebhook(w http.ResponseWriter, r *http.Request) error 
 
 	}
 
+	err = utils.SendMail("")
+	if err != nil {
+		return err
+	}
 	w.WriteHeader(http.StatusOK)
 	return nil
 }
