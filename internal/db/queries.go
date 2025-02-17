@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 	"strings"
+
+	"github.com/gofrs/uuid"
 )
 
 func GetProducts() []Product {
@@ -134,7 +136,9 @@ func InsertCartItems(tx *sql.Tx, cartItems []CartItem, orderId string) error {
 		fmt.Println(item.Quantity)
 		fmt.Println(item.SubTotal)
 
-		queryArgs = append(queryArgs, item.Id)
+		uid, _ := uuid.NewV4()
+
+		queryArgs = append(queryArgs, uid.String())
 		queryArgs = append(queryArgs, item.Product.Id)
 		queryArgs = append(queryArgs, orderId)
 		queryArgs = append(queryArgs, item.Quantity)
