@@ -126,7 +126,7 @@ func HandleCreateCheckoutSession(w http.ResponseWriter, r *http.Request) error {
 		ShippingAddressCollection: &stripe.CheckoutSessionShippingAddressCollectionParams{
 			AllowedCountries: stripe.StringSlice([]string{"US"}),
 		},
-		SuccessURL: stripe.String("http://localhost:5173/order/" + order.Id + "?resetCart=true"),
+		SuccessURL: stripe.String(fmt.Sprintf("%s/order/", os.Getenv("CLIENT_DOMAIN")) + order.Id + "?resetCart=true"),
 		CancelURL:  stripe.String(fmt.Sprintf("%s/cart", os.Getenv("CLIENT_DOMAIN"))),
 		Metadata: map[string]string{
 			"orderId": order.Id,
