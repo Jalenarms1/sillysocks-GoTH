@@ -116,7 +116,7 @@ func SendOrderPaidEmail(order *db.Order) error {
 
 	msg := []byte(subject + contentType + body)
 
-	t, err := template.ParseFiles("templates/orderPaid.html")
+	t, err := template.ParseFiles("./templates/orderPaid.html")
 	if err != nil {
 		return err
 	}
