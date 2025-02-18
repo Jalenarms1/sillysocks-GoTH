@@ -56,7 +56,7 @@ func SendOrderPaidEmail(order *db.Order) error {
       <!-- Product Table -->
       <tr>
         <td>
-          <table width="100%" style="border-collapse: collapse;">
+          <table width="100vw" style="border-collapse: collapse;">
             <tr>
               <th style="text-align: left; padding: 10px;">Product</th>
               <th style="text-align: left; padding: 10px;">Quantity</th>
