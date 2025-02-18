@@ -32,9 +32,7 @@ func SendOrderPaidEmail(order *db.Order) error {
 
 	subject := "Thank you for your order!\n"
 	contentType := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
-	body := `<html><body>
-	<p>Test</p>
-  </body></html>`
+	body := `<html><body><p>Test</p></body></html>`
 
 	msg := []byte(subject + contentType + body)
 
