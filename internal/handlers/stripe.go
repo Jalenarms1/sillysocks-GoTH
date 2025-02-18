@@ -224,14 +224,14 @@ func HandleCheckoutSessionWebhook(w http.ResponseWriter, r *http.Request) error 
 				return err
 			}
 
+			err = utils.SendOrderPaidEmail(existingOrder)
+			if err != nil {
+				return err
+			}
 		}
 
 	}
 
-	err = utils.SendMail("")
-	if err != nil {
-		return err
-	}
 	w.WriteHeader(http.StatusOK)
 	return nil
 }
