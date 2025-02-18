@@ -30,9 +30,9 @@ func SendMail(toAddr string) error {
 func SendOrderPaidEmail(order *db.Order) error {
 	from := "dev.test.jalen@gmail.com"
 
-	subject := fmt.Sprintf("Thank you for your order!\n")
+	subject := "Thank you for your order!\n"
 	contentType := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
-	body := `<body
+	body := `<body>
 	<p>Test</p>
   </body>`
 
