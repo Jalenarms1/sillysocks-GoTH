@@ -31,14 +31,14 @@
             <tr>
               <td style="padding: 10px; border-top: 1px solid #ddd;">
                 <img
-                  src="{{ .Image }}"
+                  src="{{ .ProductImage }}"
                   alt="Product Image"
                   style="width: 80px; height: auto; border-radius: 4px; display: block;"
                 />
-                <p style="margin: 5px 0; font-size: 14px;">{{ .Product.Name }}</p>
+                <p style="margin: 5px 0; font-size: 14px;">{{ .ProductName }}</p>
               </td>
               <td style="padding: 10px; border-top: 1px solid #ddd;">{{ .Quantity }}</td>
-              <td style="padding: 10px; border-top: 1px solid #ddd;">${{ .Price }}/td>
+              <td style="padding: 10px; border-top: 1px solid #ddd;">${{ .SubTotal }}/td>
             
             
             </tr>
