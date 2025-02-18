@@ -12,13 +12,16 @@ type Product struct {
 }
 
 type CartItem struct {
-	Id        string  `db:"Id" json:"id"`
-	ProductId string  `db:"ProductId" json:"productId"`
-	Product   Product `db:"Product" json:"product,omitempty"`
-	OrderId   *string `db:"OrderId" json:"orderId"`
-	Quantity  int32   `db:"Quantity" json:"quantity"`
-	SubTotal  int64   `db:"SubTotal" json:"subTotal"`
-	Size      string  `db:"Size" json:"size"`
+	Id           string  `db:"Id" json:"id"`
+	ProductId    string  `db:"ProductId" json:"productId"`
+	ProductName  string  `db:"ProductName" json:"productName"`
+	ProductImage string  `db:"ProductImage" json:"productImage"`
+	ProductPrice string  `db:"ProductPrice" json:"productPrice"`
+	Product      Product `db:"Product" json:"product,omitempty"`
+	OrderId      *string `db:"OrderId" json:"orderId"`
+	Quantity     int32   `db:"Quantity" json:"quantity"`
+	SubTotal     int64   `db:"SubTotal" json:"subTotal"`
+	Size         string  `db:"Size" json:"size"`
 }
 
 type Order struct {

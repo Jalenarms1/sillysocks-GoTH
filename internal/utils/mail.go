@@ -1,9 +1,11 @@
 package utils
 
 import (
+	"bytes"
 	"fmt"
 	"net/smtp"
 	"os"
+	"text/template"
 
 	"github.com/Jalenarms1/sillysocks-GoTH/internal/db"
 )
@@ -25,6 +27,10 @@ func SendMail(toAddr string) error {
 	}
 
 	return nil
+}
+
+type EmailData struct {
+	Products []db.CartItem
 }
 
 func SendOrderPaidEmail(order *db.Order) error {
@@ -110,8 +116,19 @@ func SendOrderPaidEmail(order *db.Order) error {
 
 	msg := []byte(subject + contentType + body)
 
+	t, err := template.ParseFiles("templates/orderPaid.html")
+	if err != nil {
+		return err
+	}
+
+	var newBody bytes.Buffer
+	err = t.Execute(&newBody, &EmailData{Products: order.CartItems})
+	if err != nil {
+		return err
+	}
+
 	auth := smtp.PlainAuth("", "dev.test.jalen@gmail.com", os.Getenv("EMAIL_AP"), "smtp.gmail.com")
-	err := smtp.SendMail("smtp.gmail.com:587", auth, from, []string{*order.CustomerEmail}, msg)
+	err = smtp.SendMail("smtp.gmail.com:587", auth, from, []string{*order.CustomerEmail}, msg)
 	if err != nil {
 		return err
 	}

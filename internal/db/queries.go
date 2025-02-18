@@ -104,14 +104,14 @@ func (o *Order) Save() error {
 func (o *Order) LoadCartItems() error {
 
 	var cartItems []CartItem
-	res, err := DB.Query("select Id, ProductId, OrderId, Quantity, SubTotal, Size from CartItem where OrderId = ?", o.Id)
+	res, err := DB.Query("select Id, ProductId, ProductName, ProductImage, ProductPrice, OrderId, Quantity, SubTotal, Size from CartItem where OrderId = ?", o.Id)
 	if err != nil {
 		return err
 	}
 
 	for res.Next() {
 		var ci CartItem
-		err := res.Scan(&ci.Id, &ci.ProductId, &ci.OrderId, &ci.Quantity, &ci.SubTotal, &ci.Size)
+		err := res.Scan(&ci.Id, &ci.ProductId, &ci.ProductName, &ci.ProductImage, &ci.ProductPrice, &ci.OrderId, &ci.Quantity, &ci.SubTotal, &ci.Size)
 		if err != nil {
 			return err
 		}
@@ -129,7 +129,7 @@ func InsertCartItems(tx *sql.Tx, cartItems []CartItem, orderId string) error {
 	queryArgs := []interface{}{}
 
 	for i, item := range cartItems {
-		queryStrings[i] = "(?, ?, ?, ?, ?, ?)"
+		queryStrings[i] = "(?, ?, ?, ?, ?, ?, ?, ?, ?)"
 		fmt.Println(item.Id)
 		fmt.Println(item.Product.Id)
 		fmt.Println(orderId)
@@ -140,6 +140,9 @@ func InsertCartItems(tx *sql.Tx, cartItems []CartItem, orderId string) error {
 
 		queryArgs = append(queryArgs, uid.String())
 		queryArgs = append(queryArgs, item.Product.Id)
+		queryArgs = append(queryArgs, item.Product.Name)
+		queryArgs = append(queryArgs, item.Product.Image)
+		queryArgs = append(queryArgs, item.Product.Price)
 		queryArgs = append(queryArgs, orderId)
 		queryArgs = append(queryArgs, item.Quantity)
 		queryArgs = append(queryArgs, item.SubTotal)
@@ -149,7 +152,7 @@ func InsertCartItems(tx *sql.Tx, cartItems []CartItem, orderId string) error {
 
 	fmt.Println(queryArgs)
 
-	_, err := tx.Exec("insert into CartItem (Id, ProductId, OrderId, Quantity, SubTotal, Size) values "+strings.Join(queryStrings, ", "), queryArgs...)
+	_, err := tx.Exec("insert into CartItem (Id, ProductId, ProductName, ProductImage, ProductPrice, OrderId, Quantity, SubTotal, Size) values "+strings.Join(queryStrings, ", "), queryArgs...)
 
 	return err
 
