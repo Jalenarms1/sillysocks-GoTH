@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/smtp"
 	"os"
+	"path/filepath"
 	"text/template"
 
 	"github.com/Jalenarms1/sillysocks-GoTH/internal/db"
@@ -116,7 +117,12 @@ func SendOrderPaidEmail(order *db.Order) error {
 
 	msg := []byte(subject + contentType + body)
 
-	t, err := template.ParseFiles("../../templates/orderPaid.html")
+	dir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	t, err := template.ParseFiles(filepath.Join(dir, "templates", "orderPaid.html"))
 	if err != nil {
 		return err
 	}
