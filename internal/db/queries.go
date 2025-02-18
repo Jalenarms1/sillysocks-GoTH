@@ -154,7 +154,7 @@ func InsertCartItems(tx *sql.Tx, cartItems []CartItem, orderId string) error {
 
 	fmt.Println(queryArgs)
 
-	_, err := tx.Exec("insert into CartItem (Id, ProductId, OrderId, Quantity, SubTotal) values "+strings.Join(queryStrings, ", "), queryArgs...)
+	_, err := tx.Exec("insert into CartItem (Id, ProductId, OrderId, Quantity, SubTotal, Size) values "+strings.Join(queryStrings, ", "), queryArgs...)
 
 	return err
 
