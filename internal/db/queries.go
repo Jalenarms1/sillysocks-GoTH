@@ -104,14 +104,14 @@ func (o *Order) Save() error {
 func (o *Order) LoadCartItems() error {
 
 	var cartItems []CartItem
-	res, err := DB.Query("select Id, ProductId, OrderId, Quantity, SubTotal from CartItem where OrderId = ?", o.Id)
+	res, err := DB.Query("select Id, ProductId, OrderId, Quantity, SubTotal, Size from CartItem where OrderId = ?", o.Id)
 	if err != nil {
 		return err
 	}
 
 	for res.Next() {
 		var ci CartItem
-		err := res.Scan(&ci.Id, &ci.ProductId, &ci.OrderId, &ci.Quantity, &ci.SubTotal)
+		err := res.Scan(&ci.Id, &ci.ProductId, &ci.OrderId, &ci.Quantity, &ci.SubTotal, &ci.Size)
 		if err != nil {
 			return err
 		}
