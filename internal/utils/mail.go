@@ -27,7 +27,7 @@ func SendMail(toAddr string) error {
 	return nil
 }
 
-func SendOrderPaidEmail(order db.Order) error {
+func SendOrderPaidEmail(order *db.Order) error {
 	from := "dev.test.jalen@gmail.com"
 
 	subject := fmt.Sprintf("Thank you for your order!\n")
