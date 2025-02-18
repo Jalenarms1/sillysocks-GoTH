@@ -49,8 +49,10 @@ func HandleCreateCheckoutSession(w http.ResponseWriter, r *http.Request) error {
 			Quantity: stripe.Int64(int64(item.Quantity)),
 			PriceData: &stripe.CheckoutSessionLineItemPriceDataParams{
 				ProductData: &stripe.CheckoutSessionLineItemPriceDataProductDataParams{
-					Name:   &item.Product.Name,
-					Images: stripe.StringSlice([]string{*item.Product.Image})},
+					Description: stripe.String(fmt.Sprintf("Size: %s", item.Size)),
+					Name:        &item.Product.Name,
+					Images:      stripe.StringSlice([]string{*item.Product.Image})},
+
 				UnitAmount: stripe.Int64(item.Product.Price),
 				Currency:   stripe.String("usd"),
 			},

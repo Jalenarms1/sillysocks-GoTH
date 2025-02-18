@@ -129,7 +129,7 @@ func InsertCartItems(tx *sql.Tx, cartItems []CartItem, orderId string) error {
 	queryArgs := []interface{}{}
 
 	for i, item := range cartItems {
-		queryStrings[i] = "(?, ?, ?, ?, ?)"
+		queryStrings[i] = "(?, ?, ?, ?, ?, ?)"
 		fmt.Println(item.Id)
 		fmt.Println(item.Product.Id)
 		fmt.Println(orderId)
@@ -143,6 +143,7 @@ func InsertCartItems(tx *sql.Tx, cartItems []CartItem, orderId string) error {
 		queryArgs = append(queryArgs, orderId)
 		queryArgs = append(queryArgs, item.Quantity)
 		queryArgs = append(queryArgs, item.SubTotal)
+		queryArgs = append(queryArgs, item.Size)
 
 	}
 
