@@ -33,78 +33,7 @@ func SendOrderPaidEmail(order *db.Order) error {
 	subject := fmt.Sprintf("Thank you for your order!\n")
 	contentType := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
 	body := `<body
-    style="
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      margin: 0;
-      padding: 20px;
-    "
-  >
-    <table
-      align="center"
-      width="600"
-      style="background-color: #ffffff; padding: 20px; border-radius: 8px;"
-    >
-      <!-- Header -->
-      <tr>
-        <td align="center">
-          <h2 style="color: #333;">Thank You for Your Order!</h2>
-          <p style="color: #666;">Your order has been confirmed.</p>
-        </td>
-      </tr>
-
-      <tr>
-        <td>
-          <table width="100%" style="border-collapse: collapse;">
-            <tr>
-              <th style="text-align: left; padding: 10px;">Product</th>
-              <th style="text-align: left; padding: 10px;">Quantity</th>
-              <th style="text-align: left; padding: 10px;">Price</th>
-            </tr>
-
-            <!-- Example Product (Repeat this row dynamically in your email template) -->
-            <tr>
-              <td style="padding: 10px; border-top: 1px solid #ddd;">
-                <img
-                  src="PRODUCT_IMAGE_URL"
-                  alt="Product Image"
-                  style="width: 80px; height: auto; border-radius: 4px; display: block;"
-                />
-                <p style="margin: 5px 0; font-size: 14px;">Product Name</p>
-              </td>
-              <td style="padding: 10px; border-top: 1px solid #ddd;">2</td>
-              <td style="padding: 10px; border-top: 1px solid #ddd;">$50.00</td>
-            </tr>
-            <!-- Repeat End -->
-
-          </table>
-        </td>
-      </tr>
-
-      <tr>
-        <td align="right" style="padding: 20px;">
-          <h3 style="margin: 0;">Total: $TOTAL_AMOUNT</h3>
-        </td>
-      </tr>
-
-      <tr>
-        <td align="center" style="padding: 20px;">
-          <a
-            href="https://yourwebsite.com/orders/ORDER_ID"
-            style="
-              background-color: #28a745;
-              color: white;
-              padding: 12px 24px;
-              text-decoration: none;
-              font-size: 16px;
-              border-radius: 5px;
-              display: inline-block;
-            "
-            >View Order Details</a
-          >
-        </td>
-      </tr>
-    </table>
+	<p>Test</p>
   </body>`
 
 	msg := []byte(subject + contentType + body)
