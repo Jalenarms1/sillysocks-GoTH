@@ -148,7 +148,7 @@ func InsertCartItems(tx *sql.Tx, cartItems []CartItem, orderId string) error {
 	}
 
 	fmt.Printf(
-		"INSERT INTO CartItem (Id, ProductId, OrderId, Quantity, SubTotal) VALUES %s",
+		"INSERT INTO CartItem (Id, ProductId, OrderId, Quantity, SubTotal, Size) VALUES %s",
 		strings.Join(queryStrings, ", "),
 	)
 
