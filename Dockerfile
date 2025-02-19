@@ -12,7 +12,7 @@ FROM scratch
 WORKDIR /root
 
 COPY --from=builder /app/bin .
-COPY --from=builder /app/templates /templates
+COPY --from=builder /app/templates /root/templates
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
