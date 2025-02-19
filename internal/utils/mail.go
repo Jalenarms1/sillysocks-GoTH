@@ -31,8 +31,15 @@ func SendMail(toAddr string) error {
 	return nil
 }
 
+type EmailCartItem struct {
+	ProductPrice string
+	Quantity     int32
+	SubTotal     string
+}
+
 type EmailData struct {
-	Products     []db.CartItem
+	CartItems    []EmailCartItem
+	Tax          float64
 	Total        float64
 	OrderId      string
 	CustomerName string
@@ -134,8 +141,26 @@ func SendOrderPaidEmail(order *db.Order) error {
 		products[i].ProductPrice = products[i].ProductPrice / 100
 	}
 
+	seq := func(yield func(cartItem EmailCartItem) bool) {
+		for _, item := range order.CartItems {
+			fmt.Println(item.ProductPrice / 100)
+			emailCartItem := &EmailCartItem{
+				ProductPrice: fmt.Sprintf("%.2f", float64(item.ProductPrice)/100),
+				Quantity:     item.Quantity,
+				SubTotal:     fmt.Sprintf("%.2f", float64(item.SubTotal)/100),
+			}
+
+			yield(*emailCartItem)
+		}
+	}
+
+	emailData := &EmailData{
+		CartItems: slices.Collect(seq),
+		Total:     float64(order.GrandTotal) / 100,
+	}
+
 	var newBody bytes.Buffer
-	err = t.Execute(&newBody, &EmailData{Products: products, Total: float64(order.GrandTotal / 100)})
+	err = t.Execute(&newBody, emailData)
 	if err != nil {
 		return err
 	}
