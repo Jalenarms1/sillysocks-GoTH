@@ -23,6 +23,15 @@ func init() {
 
 	fmt.Println("Connected to DB")
 
+	path, _ := os.Getwd()
+
+	dir, err := os.ReadDir(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(dir)
+
 }
 
 func main() {
