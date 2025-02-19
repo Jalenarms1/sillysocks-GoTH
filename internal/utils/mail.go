@@ -40,12 +40,13 @@ type EmailCartItem struct {
 }
 
 type EmailData struct {
-	CartItems    []EmailCartItem
-	SubTotal     string
-	Tax          string
-	Total        string
-	OrderId      string
-	CustomerName string
+	CartItems     []EmailCartItem
+	NumberOfItems int32
+	SubTotal      string
+	Tax           string
+	Total         string
+	OrderId       string
+	CustomerName  string
 }
 
 func SendOrderPaidEmail(order *db.Order) error {
@@ -162,12 +163,18 @@ func SendOrderPaidEmail(order *db.Order) error {
 		}
 	}
 
+	var numOfCartItems int
+	for _, item := range order.CartItems {
+		numOfCartItems += item.Product.Quantity
+	}
+
 	emailData := &EmailData{
-		CartItems: slices.Collect(seq),
-		SubTotal:  fmt.Sprintf("%.2f", float64(order.SubTotal)/100),
-		Tax:       fmt.Sprintf("%.2f", float64(order.Tax)/100),
-		Total:     fmt.Sprintf("%.2f", float64(order.GrandTotal)/100),
-		OrderId:   order.Id,
+		CartItems:     slices.Collect(seq),
+		NumberOfItems: int32(numOfCartItems),
+		SubTotal:      fmt.Sprintf("%.2f", float64(order.SubTotal)/100),
+		Tax:           fmt.Sprintf("%.2f", float64(order.Tax)/100),
+		Total:         fmt.Sprintf("%.2f", float64(order.GrandTotal)/100),
+		OrderId:       order.Id,
 	}
 
 	var newBody bytes.Buffer
