@@ -145,7 +145,10 @@ func SendOrderPaidEmail(order *db.Order) error {
 	}
 
 	seq := func(yield func(cartItem EmailCartItem) bool) {
-		for _, item := range order.CartItems {
+		for i, item := range order.CartItems {
+			if i > 1 {
+				return
+			}
 			fmt.Println(item.ProductPrice / 100)
 			emailCartItem := &EmailCartItem{
 				ProductPrice: fmt.Sprintf("%.2f", float64(item.ProductPrice)/100),
