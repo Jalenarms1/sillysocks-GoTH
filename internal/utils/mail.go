@@ -41,9 +41,9 @@ type EmailCartItem struct {
 
 type EmailData struct {
 	CartItems    []EmailCartItem
-	SubTotal     float64
-	Tax          float64
-	Total        float64
+	SubTotal     string
+	Tax          string
+	Total        string
 	OrderId      string
 	CustomerName string
 }
@@ -161,9 +161,9 @@ func SendOrderPaidEmail(order *db.Order) error {
 
 	emailData := &EmailData{
 		CartItems: slices.Collect(seq),
-		SubTotal:  float64(order.SubTotal) / 100,
-		Tax:       float64(order.Tax) / 100,
-		Total:     float64(order.GrandTotal) / 100,
+		SubTotal:  fmt.Sprintf("%.2f", float64(order.SubTotal)/100),
+		Tax:       fmt.Sprintf("%.2f", float64(order.Tax)/100),
+		Total:     fmt.Sprintf("%.2f", float64(order.GrandTotal)/100),
 	}
 
 	var newBody bytes.Buffer
