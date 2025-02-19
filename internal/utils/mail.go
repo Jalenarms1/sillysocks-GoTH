@@ -164,6 +164,7 @@ func SendOrderPaidEmail(order *db.Order) error {
 		SubTotal:  fmt.Sprintf("%.2f", float64(order.SubTotal)/100),
 		Tax:       fmt.Sprintf("%.2f", float64(order.Tax)/100),
 		Total:     fmt.Sprintf("%.2f", float64(order.GrandTotal)/100),
+		OrderId:   order.Id,
 	}
 
 	var newBody bytes.Buffer
