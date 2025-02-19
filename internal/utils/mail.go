@@ -175,7 +175,7 @@ func SendOrderPaidEmail(order *db.Order) error {
 
 	msg := []byte(subject + contentType + newBody.String())
 
-	auth := smtp.PlainAuth("", "dev.test.jalen@gmail.com", os.Getenv("EMAIL_AP"), "smtp.gmail.com")
+	auth := smtp.PlainAuth("", from, os.Getenv("EMAIL_AP"), "smtp.gmail.com")
 	err = smtp.SendMail("smtp.gmail.com:587", auth, from, []string{*order.CustomerEmail}, msg)
 	if err != nil {
 		return err
