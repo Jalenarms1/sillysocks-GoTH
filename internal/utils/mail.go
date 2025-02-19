@@ -6,6 +6,7 @@ import (
 	"net/smtp"
 	"os"
 	"path/filepath"
+	"slices"
 	"text/template"
 
 	"github.com/Jalenarms1/sillysocks-GoTH/internal/db"
@@ -31,7 +32,10 @@ func SendMail(toAddr string) error {
 }
 
 type EmailData struct {
-	Products []db.CartItem
+	Products     []db.CartItem
+	Total        float64
+	OrderId      string
+	CustomerName string
 }
 
 func SendOrderPaidEmail(order *db.Order) error {
@@ -125,13 +129,18 @@ func SendOrderPaidEmail(order *db.Order) error {
 		return err
 	}
 
+	products := slices.Clone(order.CartItems)
+	for i, _ := range products {
+		products[i].ProductPrice = products[i].ProductPrice / 100
+	}
+
 	var newBody bytes.Buffer
-	err = t.Execute(&newBody, &EmailData{Products: order.CartItems})
+	err = t.Execute(&newBody, &EmailData{Products: products, Total: float64(order.GrandTotal / 100)})
 	if err != nil {
 		return err
 	}
 
-	msg := []byte(subject + contentType + string(newBody.Bytes()))
+	msg := []byte(subject + contentType + newBody.String())
 
 	auth := smtp.PlainAuth("", "dev.test.jalen@gmail.com", os.Getenv("EMAIL_AP"), "smtp.gmail.com")
 	err = smtp.SendMail("smtp.gmail.com:587", auth, from, []string{*order.CustomerEmail}, msg)
