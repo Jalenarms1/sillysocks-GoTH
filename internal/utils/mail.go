@@ -163,7 +163,7 @@ func SendOrderPaidEmail(order *db.Order) error {
 		}
 	}
 
-	var numOfCartItems int
+	numOfCartItems := 0
 	for _, item := range order.CartItems {
 		numOfCartItems += int(item.Quantity)
 	}
