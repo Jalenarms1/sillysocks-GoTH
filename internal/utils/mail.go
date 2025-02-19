@@ -115,8 +115,6 @@ func SendOrderPaidEmail(order *db.Order) error {
     </table>
   </body></html>`
 
-	msg := []byte(subject + contentType + body)
-
 	dir, err := os.Getwd()
 	if err != nil {
 		return err
@@ -133,8 +131,10 @@ func SendOrderPaidEmail(order *db.Order) error {
 		return err
 	}
 
+	msg := []byte(subject + contentType + string(newBody.Bytes()))
+
 	auth := smtp.PlainAuth("", "dev.test.jalen@gmail.com", os.Getenv("EMAIL_AP"), "smtp.gmail.com")
-	err = smtp.SendMail("smtp.gmail.com:587", auth, from, []string{*order.CustomerEmail}, newBody.Bytes())
+	err = smtp.SendMail("smtp.gmail.com:587", auth, from, []string{*order.CustomerEmail}, msg)
 	if err != nil {
 		return err
 	}
