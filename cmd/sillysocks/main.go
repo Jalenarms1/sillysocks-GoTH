@@ -13,7 +13,7 @@ import (
 
 func init() {
 	if err := godotenv.Load(); err != nil {
-		log.Fatal("ENV not loaded")
+		// log.Fatal("ENV not loaded")
 	}
 
 	if err := db.SetDB(); err != nil {
