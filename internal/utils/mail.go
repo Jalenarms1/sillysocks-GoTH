@@ -49,7 +49,7 @@ type EmailData struct {
 }
 
 func SendOrderPaidEmail(order *db.Order) error {
-	from := "dev.test.jalen@gmail.com"
+	from := "sillysocksandmore@sillysocksandmore.com"
 
 	subject := "Subject: Thank you for your order!\n"
 	contentType := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
