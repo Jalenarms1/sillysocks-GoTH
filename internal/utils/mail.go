@@ -165,7 +165,7 @@ func SendOrderPaidEmail(order *db.Order) error {
 
 	var numOfCartItems int
 	for _, item := range order.CartItems {
-		numOfCartItems += item.Product.Quantity
+		numOfCartItems += int(item.Quantity)
 	}
 
 	emailData := &EmailData{
