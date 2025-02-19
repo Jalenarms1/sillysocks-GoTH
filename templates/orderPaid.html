@@ -32,11 +32,11 @@
                 <img
                   src="{{ .ProductImage }}"
                   alt="Product Image"
-                  style="width: 80px; height: auto; border-radius: 4px; display: block;"
+                  style="width: 80px; height: 80px; border-radius: 4px; display: block;"
                 />
                 <div style="display: flex; flex-direction: column; gap: 5px; margin-left: 10px;">
-                  <p style="font-size: 14px;">{{ .ProductName }}</p>
-                  <p style="opacity: 0.5; font-size: 14px;">{{ .ProductPrice }} x{{.Quantity}}</p>
+                  <p style="font-size: 16px;">{{ .ProductName }}</p>
+                  <p style="opacity: 0.5; font-size: 14px;">${{ .ProductPrice }} x{{.Quantity}}</p>
                 </div>
               </td>
               <td style="padding: 10px; border-top: 1px solid #ddd;">${{ .SubTotal }}</td>
@@ -52,8 +52,10 @@
 
       <!-- Order Summary -->
       <tr>
-        <td style="padding: 20px;">
-          <h3 style="margin: 0;">Total: {{  .Total }}</h3>
+        <td style="padding: 20px; display: flex; flex-direction: column;">
+          <h3 style="margin: 5px 0;">SubTotal: ${{  .Total }}</h3>
+          <h3 style="margin: 5px 0;">Tax: ${{  .Total }}</h3>
+          <h3 style="margin: 5px 0;">Total: ${{  .Total }}</h3>
         </td>
       </tr>
 
