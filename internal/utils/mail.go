@@ -34,6 +34,7 @@ func SendMail(toAddr string) error {
 type EmailCartItem struct {
 	ProductPrice string
 	ProductImage string
+	ProductName  string
 	Quantity     int32
 	SubTotal     string
 }
@@ -148,6 +149,7 @@ func SendOrderPaidEmail(order *db.Order) error {
 			emailCartItem := &EmailCartItem{
 				ProductPrice: fmt.Sprintf("%.2f", float64(item.ProductPrice)/100),
 				ProductImage: item.ProductImage,
+				ProductName:  item.ProductName,
 				Quantity:     item.Quantity,
 				SubTotal:     fmt.Sprintf("%.2f", float64(item.SubTotal)/100),
 			}
